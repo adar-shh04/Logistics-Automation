@@ -1,51 +1,68 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-navy: #0B132B;
-  --color-brand-blue: #1C2541;
-  --color-brand-teal: #3A506B;
-  --color-brand-light: #5BC0BE;
-  --color-brand-accent: #6FFFE9;
+  --color-brand-primary: #135bec;
+  --color-brand-primary-hover: #104abf;
+  --color-brand-bg: #0a0a0a;
+  --color-brand-surface: #141414;
+  --color-brand-surface-hover: #1f1f1f;
+  --color-brand-border: #2a2a2a;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, var(--color-brand-navy) 0%, var(--color-brand-blue) 100%);
-  color: #fff;
+  background-color: var(--color-brand-bg);
+  color: #f0f0f0;
   min-height: 100vh;
 }
 
-/* Glassmorphism utilities */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Base styles to match Stitch Round Twelve dark theme */
+.panel {
+  background-color: var(--color-brand-surface);
+  border: 1px solid var(--color-brand-border);
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background-color: var(--color-brand-primary);
+  color: white;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-brand-primary-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-brand-border);
   color: white;
-  border-radius: 0.5rem;
+  border-radius: 12px;
+  padding: 0.75rem;
 }
 
 .glass-input::file-selector-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background-color: var(--color-brand-surface-hover);
+  border: 1px solid var(--color-brand-border);
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  border-radius: 8px;
   cursor: pointer;
   margin-right: 1rem;
   transition: all 0.3s ease;
 }
 
 .glass-input::file-selector-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Custom Scrollbar */
@@ -53,10 +70,10 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-brand-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-brand-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -64,12 +81,13 @@ body {
 }
 
 /* Animations */
-@keyframes pulse-border {
-  0% { border-color: rgba(91, 192, 190, 0.2); box-shadow: 0 0 0 0 rgba(91, 192, 190, 0.4); }
-  70% { border-color: rgba(91, 192, 190, 0.8); box-shadow: 0 0 0 10px rgba(91, 192, 190, 0); }
-  100% { border-color: rgba(91, 192, 190, 0.2); box-shadow: 0 0 0 0 rgba(91, 192, 190, 0); }
+@keyframes pulse-primary {
+  0% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(19, 91, 236, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0); }
 }
 
 .animate-processing {
-  animation: pulse-border 2s infinite;
+  animation: pulse-primary 2s infinite;
+  border-color: var(--color-brand-primary);
 }
