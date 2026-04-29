@@ -1,9 +1,9 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from app.config import settings
 
-# Use SQLite when running locally; PostgreSQL when deployed
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/trade_db")
+DATABASE_URL = settings.database_url
 
 
 # If using SQLite, we must add connect_args

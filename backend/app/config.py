@@ -22,6 +22,6 @@ class Settings(BaseSettings):
     model_path: str = "/app/models/isolation_forest.joblib"
 
     class Config:
-        env_file = ".env"
+        env_file = "../.env"
 
 settings = Settings()
