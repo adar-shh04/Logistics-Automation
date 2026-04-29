@@ -1,14 +1,21 @@
 import os
 import joblib
 import numpy as np
+from app.config import settings
 
-MODEL_PATH = "/app/models/isolation_forest.joblib"
+_model_cache = None
 
 def load_model():
-    if os.path.exists(MODEL_PATH):
+    global _model_cache
+    if _model_cache is not None:
+        return _model_cache
+        
+    if os.path.exists(settings.model_path):
         try:
-            return joblib.load(MODEL_PATH)
-        except Exception:
+            _model_cache = joblib.load(settings.model_path)
+            return _model_cache
+        except Exception as e:
+            print(f"Error loading model: {e}")
             return None
     return None
 

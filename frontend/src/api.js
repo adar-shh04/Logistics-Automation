@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // FastAPI backend
+// Allow overriding via Vite env vars
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const uploadInvoice = async (file) => {
   const formData = new FormData();
@@ -13,6 +14,16 @@ export const uploadInvoice = async (file) => {
     return response.data;
   } catch (error) {
     console.error("Upload error:", error);
+    throw error;
+  }
+};
+
+export const getDocumentStatus = async (uid) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/status/${uid}`);
+    return response.data;
+  } catch (error) {
+    console.error("Status check error:", error);
     throw error;
   }
 };

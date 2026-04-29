@@ -1,9 +1,18 @@
 FROM node:18-alpine
+
+LABEL maintainer="adar-shh04"
+
 WORKDIR /app
+
 COPY package.json package-lock.json* ./
+
+# Install dependencies
 RUN npm install
+
+# Copy application files
 COPY . .
-RUN npm run build
-RUN npm install -g serve
-EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+
+EXPOSE 5173
+
+# Start dev server with host binding for Docker
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
