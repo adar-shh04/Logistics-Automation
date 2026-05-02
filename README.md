@@ -1,4 +1,4 @@
-# 🌐 Digital Import-Export Automation
+# 🌐 LogisticsAUTO
 
 An industry-grade, AI-powered system designed to automate the digitization, parsing, and risk assessment of logistics documents for international trade.
 
