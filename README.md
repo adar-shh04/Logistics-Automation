@@ -1,62 +1,59 @@
 # 🌐 LogisticsAuto
 
-An industry-grade, AI-powered system designed to automate the digitization, parsing, and risk assessment of logistics documents for international trade.
+A prototype that automates the digitization, parsing, and risk scoring of international trade documents such as invoices.
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Logistics--Automation-blue?logo=github)](https://github.com/adar-shh04/Logistics-Automation)
 ![Project Overview](logistics-automation-overview.png)
 
 ## 🎯 Project Overview
-**LogisticsAuto** provides a fully integrated, containerized solution that digitizes and automates the entire logistics workflow—from booking to delivery—bringing speed, transparency, compliance, and control to global trade.
+**LogisticsAuto** takes an uploaded document, extracts its text and key fields in a background worker, scores the transaction for risk, and shows the result on a dashboard.
 
-### 🚀 Key Benefits
-- **40-60% Faster Turnaround**: Through advanced AI automation and streamlined digital workflows.
-- **80-90% Paperless Operations**: Integrated digital document management and secure e-signature support.
-- **99% Compliance Accuracy**: Automated regulatory checks with real-time global trade updates.
-- **10-20% Cost Savings**: Optimized container routing, reduced detention/demurrage, and granular cost control.
-- **100% Real-time Visibility**: Live shipment tracking with proactive exception management.
+### ✅ What It Does
+- **Asynchronous processing**: uploads return immediately while a Celery worker runs OCR, parsing, and scoring.
+- **Structured extraction**: EasyOCR reads the text and Gemini 2.5 Flash turns it into fields such as invoice number, amount, party, and HS code.
+- **Risk scoring**: an Isolation Forest model scores each transaction from 0 to 1 and flags scores above 0.6.
+- **HS code lookup**: extracted codes are matched against a small sample CSV to attach a description.
+- **Audit trail**: each processed document is written to the database and to a SHA-256 hash-chained ledger file.
+
+> **Status:** this is a portfolio prototype. It has not been benchmarked or used on production shipments, so no accuracy, speed, or cost figures are claimed. The Isolation Forest is trained on synthetic data (`backend/app/train_model.py`), and the HS code table is a sample.
 
 ---
 
 ## 🏗️ Technical Architecture (Dockerized)
 
-The system is built on a production-ready, decoupled architecture using **Docker Compose** to orchestrate five primary high-availability services.
+**Docker Compose** runs five services: `db`, `redis`, `backend`, `worker`, and `frontend`.
 
-### 🧠 Backend (The Core Engine)
-A high-performance Python ecosystem optimized for heavy-duty document processing and asynchronous task execution.
-- **FastAPI**: High-performance REST API layer handling concurrent file uploads and status polling with sub-millisecond latency.
-- **PostgreSQL 15**: Enterprise-grade relational database ensuring ACID compliance for all transaction records, audit ledgers, and document metadata.
-- **Redis 7**: High-speed message broker and caching layer facilitating seamless communication between services.
-- **Celery Worker**: Distributed task queue handling CPU-intensive operations (OCR, AI Parsing, ML) in the background to ensure a non-blocking UI.
-- **Pydantic v2**: Strict data validation and type safety across the entire data pipeline.
-- **SQLAlchemy 2.0**: Modern ORM managing complex relational queries and seamless database migrations.
+### 🧠 Backend
+- **FastAPI**: REST API for document uploads, status polling, and transaction details.
+- **PostgreSQL 15**: stores documents, transactions, and audit records.
+- **Redis 7**: message broker between the API and the worker.
+- **Celery Worker**: runs OCR, parsing, and scoring outside the request cycle.
+- **Pydantic v2**: settings and response schemas.
+- **SQLAlchemy 2.0**: ORM for the database models.
 
-### 🎨 Frontend (Command Center)
-A premium, responsive dashboard designed for real-time visibility and operational efficiency.
-- **React 18 & Vite**: Lightning-fast frontend development and optimized production bundles.
-- **Tailwind CSS v4**: Sleek, glassmorphic UI design with a custom enterprise color palette for a professional experience.
-- **State Synchronization**: Intelligent polling and reactive state management for real-time document status updates.
+### 🎨 Frontend
+- **React 18 & Vite**: the dashboard application.
+- **Tailwind CSS v4**: styling.
+- **Status polling**: the dashboard polls the API to show document status and risk scores.
 
 ### 🤖 AI & Machine Learning Pipeline
-- **Google Gemini 2.5 Flash**: Orchestrates advanced LLM-based parsing to extract structured JSON from raw document text (Invoice #, HS Codes, Line Items).
-- **EasyOCR**: Localized, high-speed OCR engine for initial text extraction from unstructured images and PDFs.
-- **Isolation Forest (Scikit-Learn)**: Production-ready anomaly detection model that calculates risk scores for every transaction based on historical data patterns.
+- **EasyOCR**: extracts raw text from uploaded documents.
+- **Google Gemini 2.5 Flash**: parses the text into structured fields.
+- **Isolation Forest (Scikit-Learn)**: produces the anomaly-based risk score.
 
 ---
 
 ## 🔄 The End-to-End Flow
 
-1.  **Enquiry & Booking**: Seamless initiation of shipments and document uploads via the Command Center.
-2.  **Shipment Planning**: Automated metadata preparation and optimal container allocation.
-3.  **Document Intelligence**: 
-    *   Secure upload to the `/data/uploads` persistent volume.
-    *   Asynchronous task dispatching via **Redis**.
-4.  **Autonomous Processing**:
-    *   **Celery Workers** ingest the task for distributed processing.
-    *   **OCR** extracts raw textual data.
-    *   **Gemini AI** performs structured extraction into validated JSON.
-    *   **ML Models** run risk assessment and flag potential compliance anomalies.
-5.  **Validation & Compliance**: Extracted goods are automatically mapped to HS Codes for regulatory validation.
-6.  **Ledger Update**: Validated data is committed to **PostgreSQL**, triggering UI updates via the polling mechanism.
+1.  **Upload**: a document is uploaded through the dashboard and saved to the `/data/uploads` volume.
+2.  **Dispatch**: the API queues a Celery task through **Redis**.
+3.  **Processing**:
+    *   **OCR** extracts the raw text.
+    *   **Gemini** extracts the structured fields.
+    *   The **HS code** is looked up in the sample table.
+    *   **Isolation Forest** scores the transaction and flags high-risk results.
+4.  **Storage**: the results are saved to **PostgreSQL** and appended to the hash-chained audit ledger.
+5.  **Display**: the dashboard picks up the result through polling.
 
 ---
 
