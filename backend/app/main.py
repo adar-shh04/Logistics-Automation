@@ -103,7 +103,7 @@ def get_transaction(tx_id: int, db: Session = Depends(get_db)):
         "party": tx.party,
         "risk_score": tx.risk_score,
         "is_flagged": tx.is_flagged,
-        "metadata": tx.metadata
+        "metadata": tx.meta_info or {}
     }
 
 @app.get("/health")

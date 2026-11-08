@@ -68,7 +68,7 @@ def process_document(doc_id: int, file_path: str):
             party=party,
             risk_score=risk_score,
             is_flagged=is_flagged,
-            metadata=fields
+            meta_info=fields
         )
         db.add(txn)
         db.commit()
