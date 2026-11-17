@@ -20,10 +20,11 @@ const LandingPage = ({ onUpload, status, error, backendHealthy }) => {
         </div>
         
         <h3 className="text-2xl font-bold mb-2">Upload Document</h3>
-        <p className="text-sm text-gray-400 mb-8">Drag and drop your invoice here, or click to browse (PDF, PNG, JPG).</p>
+        <p className="text-sm text-gray-400 mb-8">Drag and drop your invoice here, or click to browse (PNG, JPG).</p>
 
         <input
           type="file"
+          accept=".png,.jpg,.jpeg"
           onChange={(e) => {
             if(e.target.files && e.target.files[0]) {
               onUpload(e.target.files[0]);
