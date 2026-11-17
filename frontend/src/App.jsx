@@ -27,8 +27,16 @@ export default function App() {
   // Polling logic
   useEffect(() => {
     let interval;
+    let attempts = 0;
     if (status === "processing" && currentDocId) {
       interval = setInterval(async () => {
+        attempts++;
+        if (attempts >= 60) {
+          clearInterval(interval);
+          setStatus("error");
+          setError("Processing timed out after 2 minutes");
+          return;
+        }
         try {
           const res = await getDocumentStatus(currentDocId);
           if (res.status === "completed") {
@@ -37,6 +45,10 @@ export default function App() {
             setSelectedDocument(res);
             setCurrentView('review');
             clearInterval(interval);
+          } else if (res.status === "failed") {
+            clearInterval(interval);
+            setStatus("error");
+            setError(res.message || "Processing failed");
           }
         } catch (err) {
           console.error(err);
