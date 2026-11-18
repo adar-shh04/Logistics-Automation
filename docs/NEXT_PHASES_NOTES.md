@@ -11,7 +11,7 @@ This document records deviations, test counts per language, environment details,
 
 ## Test Counts by Language
 - Java (Surefire): 19 tests passing (`com.logisticsauto:logistics-api`)
-- Python (Pytest): 10 tests passing (`backend/tests/test_nlp.py`, `backend/tests/test_stream_worker.py`)
+- Python (Pytest): 18 tests passing (`backend/tests/test_nlp.py`, `backend/tests/test_scoring.py`, `backend/tests/test_stream_worker.py`)
 
 ## Phase A2 Synthetic Dataset Spot Checks
 Generated 60 synthetic invoices deterministically with seed 42 (20 dev, 40 test) using bundled fonts `DejaVuSans.ttf` and `DejaVuSerif.ttf`. Bit-identical verification passed across multiple runs.
@@ -22,6 +22,17 @@ Spot-checked 5 generated images:
 4. `inv_025.png` (test, Layout 2 - Two-Column Commercial Invoice): Two-column format with mild scan rotation and compression artifacts, invoice number `TX/26/3068`, date `11/03/2026` (`2026-03-11`), total amount Rs. 2,52,000.00 (`252000.0`), party `Reliance Logistics & Distribution`.
 5. `inv_035.png` (test, Layout 3 - Held-out Bill of Supply): Held-out layout with alternative phrasing (`Bill No. BILL-9117`, `Billing Date: 28/03/2026`, `Amount Payable: INR 1,68,000.00`, `Customer Name: Apollo Tyres National Depot`, `Tax ID (GST)`, `HS Classification`).
 
-## Runs and Status
-- **Gemini Extraction Evaluation:** Recorded as **not run** because the provided `GEMINI_API_KEY` was rejected by the upstream Google GenAI API with `400 INVALID_ARGUMENT (API key not valid)`.
-- **Regex Extraction Evaluation:** Executed on synthetic test split (40 images).
+## Part A Accuracy Evaluation Runs and Status
+- **Baseline Regex Run (Test split, N = 40):**
+  - Invoice No: 60.0% [44.60%, 73.65%]
+  - Total Amount: 0.0% [0.00%, 8.76%]
+  - Party Strict / Lenient: 0.0% [0.00%, 8.76%]
+  - Document-level accuracy: 0.0%
+  - Stored in `eval/results/2026-11-18_regex_test_baseline.json`
+- **Tuned Regex Run (Test split, N = 40):**
+  - Invoice No: 85.0% [70.93%, 92.94%]
+  - Total Amount: 97.5% [87.12%, 99.56%]
+  - Party Strict: 85.0% [70.93%, 92.94%]
+  - Party Lenient: 92.5% [80.14%, 97.42%]
+  - Stored in `eval/results/2026-11-18_regex_test.json`
+- **Gemini Extraction Evaluation:** Recorded as **not run** because the provided `GEMINI_API_KEY` was rejected by the upstream Google GenAI API with `400 INVALID_ARGUMENT (API key not valid)`. Verified error trapping and non-fallback recording.
