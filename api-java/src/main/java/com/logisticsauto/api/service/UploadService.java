@@ -5,7 +5,11 @@ import com.logisticsauto.api.domain.Document;
 import com.logisticsauto.api.queue.JobPublisher;
 import com.logisticsauto.api.repo.DocumentRepository;
 import com.logisticsauto.api.web.dto.UploadResponse;
+import com.logisticsauto.api.web.exception.BadRequestException;
 import com.logisticsauto.api.web.exception.QueueUnavailableException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,20 +31,54 @@ public class UploadService {
     private final JobPublisher jobPublisher;
     private final AppProperties appProperties;
 
+    private final Counter acceptedUploads;
+    private final Counter rejectedUploads;
+    private final Counter queueFailedUploads;
+    private final Timer jobPublishTimer;
+
     public UploadService(
             FileStorageService fileStorageService,
             DocumentRepository documentRepository,
             JobPublisher jobPublisher,
-            AppProperties appProperties
+            AppProperties appProperties,
+            MeterRegistry meterRegistry
     ) {
         this.fileStorageService = fileStorageService;
         this.documentRepository = documentRepository;
         this.jobPublisher = jobPublisher;
         this.appProperties = appProperties;
+
+        this.acceptedUploads = Counter.builder("logistics_uploads_total")
+                .tag("outcome", "accepted")
+                .description("Total document upload attempts")
+                .register(meterRegistry);
+
+        this.rejectedUploads = Counter.builder("logistics_uploads_total")
+                .tag("outcome", "rejected")
+                .description("Total document upload attempts")
+                .register(meterRegistry);
+
+        this.queueFailedUploads = Counter.builder("logistics_uploads_total")
+                .tag("outcome", "queue_failed")
+                .description("Total document upload attempts")
+                .register(meterRegistry);
+
+        this.jobPublishTimer = Timer.builder("logistics_job_publish_seconds")
+                .description("Time taken to publish jobs to Redis stream")
+                .register(meterRegistry);
     }
 
     public UploadResponse upload(MultipartFile file) {
-        FileStorageService.StoredFile storedFile = fileStorageService.save(file);
+        FileStorageService.StoredFile storedFile;
+        try {
+            storedFile = fileStorageService.save(file);
+        } catch (BadRequestException e) {
+            rejectedUploads.increment();
+            throw e;
+        } catch (Exception e) {
+            rejectedUploads.increment();
+            throw e;
+        }
 
         Document doc = new Document();
         doc.setFilename(storedFile.uid());
@@ -61,15 +99,17 @@ public class UploadService {
                     "attempt", "1",
                     "enqueued_at", Instant.now().toString()
             );
-            jobPublisher.publish(appProperties.jobsStream(), payload);
+            jobPublishTimer.record(() -> jobPublisher.publish(appProperties.jobsStream(), payload));
         } catch (Exception e) {
             log.error("Failed to publish job to Redis stream: {}", e.getMessage(), e);
             doc.setStatus("failed");
             doc.setProcessingNotes("Queue unavailable");
             documentRepository.save(doc);
+            queueFailedUploads.increment();
             throw new QueueUnavailableException("Queue unavailable");
         }
 
+        acceptedUploads.increment();
         return new UploadResponse(
                 "Document uploaded successfully",
                 storedFile.uid(),

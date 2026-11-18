@@ -212,3 +212,48 @@ def test_idempotency_skip_duplicate(monkeypatch, db_session, fake_redis, dummy_f
     assert doc.processed is True
     pending = fake_redis.xpending(STREAM_KEY, CONSUMER_GROUP)
     assert pending["pending"] == 0
+
+
+def test_worker_stub_mode_off_by_default():
+    from app import stream_worker
+    assert stream_worker.WORKER_STUB_MODE is False
+
+
+def test_worker_stub_mode_execution(monkeypatch, db_session, fake_redis, dummy_file):
+    from app import stream_worker
+    monkeypatch.setattr(stream_worker, "WORKER_STUB_MODE", True)
+    monkeypatch.setattr(stream_worker, "WORKER_STUB_DELAY_MS", 0)
+
+    audit_calls = []
+    monkeypatch.setattr("app.audit.append_audit", lambda action, payload: audit_calls.append((action, payload)))
+
+    doc = Document(
+        filename="stub_test.png",
+        original_filename="stub.png",
+        status="processing",
+        processed=False,
+    )
+    db_session.add(doc)
+    db_session.commit()
+    db_session.refresh(doc)
+
+    job_payload = {
+        "job_id": "job-stub-001",
+        "document_id": str(doc.id),
+        "file_path": dummy_file,
+        "attempt": "1",
+        "enqueued_at": "2026-11-20T10:00:00Z"
+    }
+    entry_id = fake_redis.xadd(STREAM_KEY, job_payload)
+
+    stream_worker.handle_job(fake_redis, entry_id, job_payload)
+
+    db_session.refresh(doc)
+    assert doc.status == "completed"
+    assert doc.processed is True
+
+    txn = db_session.query(Transaction).filter(Transaction.document_id == doc.id).first()
+    assert txn is not None
+    assert txn.meta_info.get("extraction_method") == "stub"
+    assert txn.party == "Stub Industrial Logistics"
+    assert len(audit_calls) == 1

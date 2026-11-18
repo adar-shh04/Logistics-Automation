@@ -1,0 +1,20 @@
+services:
+  api:
+    user: "0:0"
+    volumes:
+      - loadtest_uploads:/data/uploads
+
+  worker:
+    environment:
+      - WORKER_STUB_MODE=${WORKER_STUB_MODE:-true}
+      - WORKER_STUB_DELAY_MS=${WORKER_STUB_DELAY_MS:-500}
+      - LEDGER_FILE=/data/ledger/ledger.txt
+    volumes:
+      - loadtest_uploads:/data/uploads
+      - loadtest_ledger:/data/ledger
+      - ./backend/app:/app
+      - ./backend/app/hsdata:/app/hsdata
+
+volumes:
+  loadtest_uploads:
+  loadtest_ledger:

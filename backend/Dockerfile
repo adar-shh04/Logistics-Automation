@@ -14,6 +14,9 @@ COPY app/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /app/requirements.txt
 
+# Pre-download EasyOCR models so scaled replicas don't re-download
+RUN python -c "import easyocr; easyocr.Reader(['en'])"
+
 # Create necessary directories
 RUN mkdir -p /app/models /data/uploads /app/hsdata
 
