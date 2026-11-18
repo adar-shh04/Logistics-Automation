@@ -119,7 +119,7 @@ Every test configuration was executed **3 times**. The tables below document the
 | **OCR (EasyOCR on CPU)** | **5.1873 s** | **87.5%** | `logistics_stage_duration_seconds_sum{stage="ocr"}` |
 | **Parsing (Regex Fallback)** | **0.2267 s** | **3.8%** | `logistics_stage_duration_seconds_sum{stage="parse"}` |
 | **Risk Scoring (Isolation Forest)** | **0.0629 s** | **1.1%** | `logistics_stage_duration_seconds_sum{stage="score"}` |
-| **Database Persistence (JPA/Postgres)** | **0.0125 s** | **0.2%** | `logistics_stage_duration_seconds_sum{stage="db"}` |
+| **Database Persistence (SQLAlchemy/Postgres)** | **0.0125 s** | **0.2%** | `logistics_stage_duration_seconds_sum{stage="db"}` |
 | **Audit Ledger Append (Advisory Lock)** | **0.0056 s** | **0.1%** | `logistics_stage_duration_seconds_sum{stage="audit"}` |
 | **HS Code Lookup (CSV Map)** | **0.0000 s** | **<0.01%** | `logistics_stage_duration_seconds_sum{stage="hs_lookup"}` |
 

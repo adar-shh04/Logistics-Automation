@@ -1,0 +1,67 @@
+# Rendered at container start by the nginx image's envsubst step
+# (/etc/nginx/templates/*.template -> /etc/nginx/conf.d/). Only defined env vars
+# are substituted, so nginx variables like $host are left alone.
+#
+# APP_API_KEY is added to every proxied /api request server-side, so the key
+# never appears in the browser bundle and the dashboard works with the API key
+# filter on. The real public protection is the security-group allow-list
+# (allowed_ingress_cidrs) plus the upload rate limit below.
+
+# Rate limiting zone: 10 requests per minute per IP address
+limit_req_zone $binary_remote_addr zone=upload_limit:10m rate=10r/m;
+
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 15M;
+
+    # 1. Frontend React SPA
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 2. Strict Actuator Blocking: permit only /actuator/health
+    location = /actuator/health {
+        proxy_pass http://api:8000/actuator/health;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /actuator {
+        return 403 "{\"error\":\"Forbidden\",\"message\":\"Access to actuator endpoints is restricted\"}";
+    }
+
+    # 3. Rate-limited upload endpoint
+    location /api/upload {
+        limit_req zone=upload_limit burst=5 nodelay;
+        limit_req_status 429;
+
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass http://api:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-API-KEY "${APP_API_KEY}";
+    }
+
+    # 4. API Reverse Proxy (strips /api prefix)
+    location /api/ {
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass http://api:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-API-KEY "${APP_API_KEY}";
+    }
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}

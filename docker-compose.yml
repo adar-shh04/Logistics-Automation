@@ -24,6 +24,18 @@ services:
       - "6379:6379"
     restart: unless-stopped
 
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: logistics_s3
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=ap-south-1
+    volumes:
+      - ./infra/localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+    restart: unless-stopped
+
   api:
     build:
       context: ./api-java
@@ -35,8 +47,13 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - UPLOAD_DIR=/data/uploads
-    volumes:
-      - ./sample_docs:/data/uploads
+      - STORAGE_TYPE=${STORAGE_TYPE:-s3}
+      - S3_BUCKET=${S3_BUCKET:-logistics-uploads}
+      - AWS_REGION=${AWS_REGION:-ap-south-1}
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - S3_PATH_STYLE_ACCESS=true
+      - AWS_ACCESS_KEY_ID=${S3_LOCAL_ACCESS_KEY:-test}
+      - AWS_SECRET_ACCESS_KEY=${S3_LOCAL_SECRET_KEY:-test}
     ports:
       - "8000:8000"
     healthcheck:
@@ -50,6 +67,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      localstack:
+        condition: service_started
     restart: unless-stopped
 
   worker:
@@ -58,7 +77,6 @@ services:
     command: python -m app.stream_worker
     volumes:
       - ./backend/app:/app
-      - ./sample_docs:/data/uploads
       - ./backend/app/hsdata:/app/hsdata
       - ./backend/models:/app/models
     environment:
@@ -68,6 +86,10 @@ services:
       - UPLOAD_DIR=/data/uploads
       - LEDGER_FILE=/app/models/ledger.txt
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - AWS_REGION=${AWS_REGION:-ap-south-1}
+      - AWS_ACCESS_KEY_ID=${S3_LOCAL_ACCESS_KEY:-test}
+      - AWS_SECRET_ACCESS_KEY=${S3_LOCAL_SECRET_KEY:-test}
     depends_on:
       db:
         condition: service_healthy
@@ -75,11 +97,14 @@ services:
         condition: service_started
       api:
         condition: service_healthy
+      localstack:
+        condition: service_started
     restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
+      target: dev
     container_name: logistics_frontend
     ports:
       - "5173:5173"

@@ -85,7 +85,7 @@ def wait_for_database(timeout: int = 60):
     raise RuntimeError("Timed out waiting for database schema initialization.")
 
 
-def process(doc_id: int, file_path: str):
+def process(doc_id: int, file_path: Optional[str] = None, storage_uri: Optional[str] = None):
     job_t0 = time.perf_counter()
     db = SessionLocal()
     try:
@@ -126,11 +126,8 @@ def process(doc_id: int, file_path: str):
 
         else:
             # --- REAL PIPELINE ---
-            if not os.path.exists(file_path):
-                raise FileNotFoundError(f"File {file_path} not found")
-
-            with open(file_path, "rb") as f:
-                content = f.read()
+            from app.storage import read_file_bytes
+            content = read_file_bytes(storage_uri=storage_uri, file_path=file_path)
 
             # 1. OCR Stage
             t_stage = time.perf_counter()
@@ -226,7 +223,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
     except (ValueError, TypeError):
         attempt = 1
 
-    if not doc_id_str or not file_path:
+    storage_uri = job_data.get("storage_uri")
+    if not doc_id_str or (not file_path and not storage_uri):
         logger.error(f"Malformed job {entry_id}: {job_data}")
         r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
         if JOBS_TOTAL:
@@ -254,7 +252,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
         db.close()
 
     try:
-        process(doc_id, file_path)
+        storage_uri = job_data.get("storage_uri")
+        process(doc_id, file_path=file_path, storage_uri=storage_uri)
         r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
         if JOBS_TOTAL:
             JOBS_TOTAL.labels(outcome="success").inc()

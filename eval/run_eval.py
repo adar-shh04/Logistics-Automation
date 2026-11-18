@@ -256,7 +256,7 @@ class EvalRunner:
 
 def main():
     parser = argparse.ArgumentParser(description="Run Extraction Accuracy Evaluation")
-    parser.add_argument("--split", choices=["dev", "test", "all"], default="test", help="Dataset split to evaluate")
+    parser.add_argument("--split", choices=["dev", "test", "holdout", "all"], default="test", help="Dataset split to evaluate")
     parser.add_argument("--method", choices=["gemini", "regex"], default="regex", help="Extraction method to evaluate")
     parser.add_argument("--limit", type=int, default=None, help="Limit number of documents to evaluate")
     parser.add_argument(

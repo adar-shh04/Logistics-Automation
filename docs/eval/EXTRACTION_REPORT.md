@@ -1,137 +1,110 @@
 # Extraction Accuracy Evaluation Report
 
-**Date:** 2026-11-18  
-**Repository Branch:** `feature/extraction-eval`  
-**Execution Environment:** Windows 11 (AMD64), Python 3.14.3, PyTorch 2.6.0 CPU, EasyOCR 1.7.2  
+**Last updated:** 2026-11-19 (first runs 2026-11-18)
+**Environment:** Windows 11 (AMD64), Python 3.14.3, PyTorch 2.11.0+cpu, EasyOCR 1.7.2, Pillow 12.2.0, all on CPU
+**Parser under test:** `backend/app/nlp.py` (git blob `8b7fad22eb60baae8d24b2a8b0f2ec3e5380f7c8`)
+
+## Summary
+
+- **Gemini has not been measured.** The available `GEMINI_API_KEY` is rejected with `400 INVALID_ARGUMENT (API key not valid)`, so every number below is for the **regex fallback parser** only.
+- **Familiar wording:** on layouts whose wording the parser was tuned on (layouts 1 and 2), the regex gets the invoice number, total and party right on most invoices.
+- **Unseen wording:** on a blind layout with label wording it was not written for (layout 4), it collapses: **26.7% invoice number, 20.0% total, 0% party**.
+- **What the regex gets right there:** only the labels it already knows (`Invoice #`, `... Amount Due`).
+- **Never extracted:** the regex has no rules at all for date, GSTIN or HS code.
+- **Conclusion:** regex extraction does not generalise beyond the layouts it was written for. That is the case for LLM extraction, and it still has to be measured with a working key.
+
+### Correction to the first version of this report
+
+The 2026-11-18 version reported tuned-regex test accuracy of 85% (invoice number), 97.5% (total) and 85% (party) and called it held-out. **Those figures are not held-out scores.**
+- Layout 3 was supposed to appear only in the test split.
+- But the tuned parser contains exactly layout 3's wording (`Bill`, `Amount Payable`, `Customer Name`), which never appears in the dev split.
+- So the parser was tuned with knowledge of the test layout.
+
+Below, layout 3 is reported separately and labelled as contaminated. A new blind set (layout 4, section 3) was generated **after** the parser was frozen and run once.
 
 ---
 
-## 1. Evaluation Setup
+## 1. Datasets
 
-### 1.1 Dataset Architecture
-- **Type:** Synthetic dataset generated using Pillow with deterministic seed (`--seed 42`).
-- **Total Invoices:** 60 images (20 `dev`, 40 `test`).
-- **Layout Distribution:**
-  - **Layout 1 (Standard Tax Invoice):** Header-table-footer format with "TAX INVOICE", seller box, "Bill To / Consignee", line items with HSN/SAC, tax calculation table, and "Grand Total: ₹...".
-  - **Layout 2 (Two-Column Commercial Invoice):** Two-column format with buyer block on the left, invoice metadata box on the right, item table, and "Total Amount: Rs. ...".
-  - **Layout 3 (Held-out Bill of Supply):** Exclusive to the `test` split. Uses altered vocabulary to test model generalization: "Bill No." instead of "Invoice No.", "Billing Date" instead of "Date", "Customer Name" instead of "Bill To", "Tax ID (GST)" instead of "GSTIN", "HS Classification" instead of "HSN/SAC", and "Amount Payable" instead of "Grand Total".
-- **Scan Artifacts:** 40% of generated images include rotation (±1.5°), Gaussian blur, and JPEG compression artifacts.
-- **Dates & Currency:** Day-first Indian dates (`DD/MM/YYYY`, `DD-MM-YYYY`, `DD.MM.YYYY`) and Indian currency notation with thousands grouping.
+| Set | Files | Layouts | Created | Used for tuning? |
+|---|---|---|---|---|
+| `dev` | `inv_001`–`inv_020` (20) | 1, 2 | 2026-11-18, `eval/generate_invoices.py --seed 42` | Yes |
+| `test` | `inv_021`–`inv_060` (40) | 1, 2, 3 | same | Layout 3 wording leaked into the parser (see above) |
+| `holdout` | `hold_001`–`hold_030` (30) | 4 | 2026-11-19, `eval/generate_holdout.py --seed 2026` (generated after the parser was frozen) | No. Run once. |
 
-### 1.2 Execution Commands
-All results are reproducible from committed raw JSON files in `eval/results/`:
+All images are **synthetic**, rendered with Pillow and bundled DejaVu fonts. 40% get mild scan artefacts (rotation ±1.5°, blur, JPEG compression). Dates are day-first (Indian format), and amounts use Indian digit grouping.
 
-1. **Synthetic Data Generation:**
-   ```powershell
-   python eval/generate_invoices.py --seed 42
-   ```
-2. **Regex Baseline Evaluation (`test` split, before dev tuning):**
-   ```powershell
-   python eval/run_eval.py --split test --method regex
-   # Raw artifact: eval/results/2026-11-18_regex_test_baseline.json
-   ```
-3. **Regex Development Evaluation (`dev` split):**
-   ```powershell
-   python eval/run_eval.py --split dev --method regex
-   # Raw artifact: eval/results/2026-11-18_regex_dev.json
-   ```
-4. **Regex Tuned Evaluation (`test` split, post dev tuning):**
-   ```powershell
-   python eval/run_eval.py --split test --method regex
-   # Raw artifact: eval/results/2026-11-18_regex_test.json
-   ```
-5. **Gemini Evaluation:**
-   ```powershell
-   python eval/run_eval.py --split test --method gemini
-   # Status: Not run (see Section 1.3)
-   ```
+**Layout 4** ("freight invoice") moves the blocks around: seller and invoice details on the left, recipient on the right, and the total in a band at the bottom left. Each invoice draws its labels at random from common Indian invoice wording:
 
-### 1.3 Upstream Model Configuration & Execution Status
-- **Gemini Model:** `gemini-2.5-flash` with structured JSON schema (`InvoiceFields`), temperature 0.1.
-- **Run Status:** **Not run**. The `GEMINI_API_KEY` provided in the environment was rejected by the upstream Google GenAI API with `400 INVALID_ARGUMENT (API key not valid)`. In compliance with Ground Rule 5 ("Every number must come from a run you actually did... If a run was not done, write 'not run' and why"), no synthetic or estimated numbers are reported for Gemini.
+| Field | Label variants |
+|---|---|
+| Number | `Document No:`, `Ref. No.:`, `Invoice #:`, `Voucher No:` |
+| Date | `Issue Date:`, `Dated:`, `Date of Issue:` |
+| Party | `Ship To:`, `Sold To:`, `Recipient:`, `Billed To:` |
+| GSTIN | `GST No.:`, `GSTIN/UIN:`, `GST Reg. No.:` |
+| HS code | `Tariff Code`, `HSN Code`, `Commodity Code` |
+| Total | `Net Amount Due:`, `Balance Due:`, `TOTAL (INR):`, `Invoice Value:` |
+| Currency | `₹`, `Rs`, `INR`, or none |
 
----
+The wording was fixed before the first run. It was chosen as realistic variety, not to make the regex pass or fail. Its author had seen the regex, so treat it as an independent layout, not a perfectly blind one.
 
-## 2. Accuracy Results (Test Split, N = 40)
+## 2. Commands
 
-Confidence intervals are calculated using the 95% Wilson score method with two-sided normal quantile $z = 1.96$.
+```powershell
+python eval/generate_invoices.py --seed 42                     # dev + test
+python eval/generate_holdout.py  --seed 2026                   # layout-4 hold-out
+python eval/run_eval.py --split test    --method regex         # eval/results/2026-11-18_regex_test.json
+python eval/run_eval.py --split holdout --method regex --labels eval/data/holdout/labels.jsonl
+                                                               # eval/results/2026-11-19_regex_holdout.json
+python eval/layout_breakdown.py eval/results/<file>.json        # per-layout table below
+python eval/run_eval.py --split test --method gemini           # NOT RUN: invalid API key
+```
 
-| Field | Regex (Baseline) | Regex (Tuned on Dev) | Gemini (`gemini-2.5-flash`) |
+The baseline (before tuning) test run is in `eval/results/2026-11-18_regex_test_baseline.json`, and the dev run is in `eval/results/2026-11-18_regex_dev.json`.
+
+## 3. Results, regex parser, per layout
+
+Accuracy is exact match after normalisation. Lenient party matching is a substring match. 95% Wilson intervals are in brackets.
+
+| Set / layout | n | Invoice no. | Total amount | Party (strict) | Party (lenient) | Status |
+|---|---|---|---|---|---|---|
+| test, layout 1 | 14 | 14/14 | 14/14 | 12/14 | 13/14 | In-distribution (same wording as dev) |
+| test, layout 2 | 13 | 13/13 | 12/13 | 12/13 | 12/13 | In-distribution (same wording as dev) |
+| test, layout 3 | 13 | 7/13 | 13/13 | 10/13 | 12/13 | **Contaminated**: the parser was tuned with this wording |
+| **holdout, layout 4** | **30** | **8/30 = 26.7%** [14.2–44.5%] | **6/30 = 20.0%** [9.5–37.3%] | **0/30 = 0%** [0–11.4%] | **0/30 = 0%** [0–11.4%] | **Blind: the only true held-out result** |
+
+Date, GSTIN and HS code: **0% on every set**, because the regex parser has no rules for them.
+
+Document-level accuracy (all 6 fields right) is **0% on every set** for the same reason.
+
+### Layout 4 by label wording
+
+| Field | Known to the regex | Correct | Unknown to the regex | Correct |
+|---|---|---|---|---|
+| Invoice no. | `Invoice #:` | 8/10 | `Ref. No.:`, `Voucher No:`, `Document No:` | 0/20 |
+| Total | `Net Amount Due:` (contains `Amount Due`) | 6/6 | `TOTAL (INR):`, `Balance Due:`, `Invoice Value:` | 0/24 |
+
+Party is 0/30 because none of the four party labels are in the regex. It then falls back to the first OCR line, which is the title `FREIGHT INVOICE`.
+
+## 4. Timing (regex runs, CPU)
+
+| Run | OCR p50 | OCR p95 | Parse p50 |
 |---|---|---|---|
-| **Invoice Number** | **60.0%** (24/40)<br>`[44.60%, 73.65%]` | **85.0%** (34/40)<br>`[70.93%, 92.94%]` | *Not run (Invalid API key)* |
-| **Invoice Date** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | *Not run (Invalid API key)* |
-| **Total Amount** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` | **97.5%** (39/40)<br>`[87.12%, 99.56%]` | *Not run (Invalid API key)* |
-| **GSTIN** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | *Not run (Invalid API key)* |
-| **HS Code** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | **0.0%** (0/40)<br>`[0.00%, 8.76%]` *(Not extracted)* | *Not run (Invalid API key)* |
-| **Party (Strict)** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` | **85.0%** (34/40)<br>`[70.93%, 92.94%]` | *Not run (Invalid API key)* |
-| **Party (Lenient Substring)** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` | **92.5%** (37/40)<br>`[80.14%, 97.42%]` | *Not run (Invalid API key)* |
-| **Document-Level (All 6 Fields)** | **0.0%** (0/40)<br>`[0.00%, 8.76%]` | **0.0%** (0/40)<br>`[0.00%, 8.76%]` | *Not run (Invalid API key)* |
+| holdout (30 images, 2026-11-19) | 6.39 s | 8.27 s | 0.2 ms |
+| test (40 images, 2026-11-18) | 4.78 s | 5.26 s | 0.1 ms |
 
----
+The hold-out images carry more text per page, and the run shared the machine with other work. OCR dominates the time in both runs.
 
-## 3. Latency & Timing
+## 5. Error analysis (from the 2026-11-18 runs, still valid)
 
-Measured on local CPU host across 40 evaluation runs:
+- **₹ read as `{` or `[` by EasyOCR:** this broke the amount regex until it was tuned on dev.
+- **Two-column layouts:** OCR line order interleaves the columns (`Buyer / Consignee:` next to `Invoice Number:`), so the baseline regex returned `Consignee:` as the party.
+- **Split words:** a trailing word on its own OCR box truncates multi-word party names (`Larsen & Toubro Heavy`).
+- **`Rs.` read as `Rs_`** on its own line, so the amount was missed (`inv_058`).
 
-| Component | Metric | Regex Pipeline | Gemini Pipeline |
-|---|---|---|---|
-| **EasyOCR (CPU)** | Median (p50) | **4.78 s** | N/A (cached) |
-| | 95th Percentile (p95) | **5.26 s** | N/A (cached) |
-| **Parsing** | Median (p50) | **0.10 ms** (< 0.001 s) | *Not run* |
-| | 95th Percentile (p95) | **0.30 ms** (< 0.001 s) | *Not run* |
-| **Total Pipeline** | Median (p50) | **4.78 s** | *Not run* |
-| | 95th Percentile (p95) | **5.26 s** | *Not run* |
+## 6. Limitations and next steps
 
----
-
-## 4. Failure Analysis & Error Categorization
-
-Analysis of failure cases observed during evaluation:
-
-### Case 1: Unseen Layout Vocabulary (Layout 3 Generalization)
-- **Document:** `inv_026.png`, `inv_032.png`, `inv_035.png` (Test Split)
-- **Field:** `invoice_no`
-- **Ground Truth:** `BILL-4978`, `BILL-2229`, `BILL-9117`
-- **Baseline Regex Output:** `None`
-- **Cause:** Baseline regex strictly required `(Invoice|Inv\.?|Tax Invoice)`. In the held-out Layout 3, the invoice header is formatted as `Bill No. BILL-XXXX`. While tuning improved recognition on period-delimited patterns, OCR segmentation sometimes grouped `Bill No` separately from the identifier.
-
-### Case 2: OCR Glyph Misrecognition on Currency Symbols
-- **Document:** `inv_001.png` (Dev Split), `inv_021.png` (Test Split)
-- **Field:** `total_amount`
-- **Ground Truth:** `7840.0`, `743400.0`
-- **Baseline Regex Output:** `None`
-- **Cause:** EasyOCR frequently transcribed the Indian Rupee symbol `₹` as an open curly brace `{` or square bracket `[`. The baseline regex only allowed `₹?` or standard digits, discarding the line entirely.
-
-### Case 3: OCR Underscore Segmentation on Currency Label
-- **Document:** `inv_058.png` (Test Split)
-- **Field:** `total_amount`
-- **Ground Truth:** `250750.0`
-- **Tuned Regex Output:** `None`
-- **Cause:** The invoice image rendered `Total Amount:\nRs. 2,50,750.00`. Due to scan compression artifacts, EasyOCR misread `Rs.` as `Rs_` on an isolated line (`Total Amount:\nRs_\n2,50,750.00`). Because the parser expects the currency token adjacent to the numeric value, it failed to extract the amount.
-
-### Case 4: Multi-Column Bounding Box Interleaving
-- **Document:** `inv_002.png` (Dev Split), `inv_024.png` (Test Split)
-- **Field:** `party`
-- **Ground Truth:** `Thermax Industrial Shipping`, `Infosys BPM Global Freight`
-- **Baseline Regex Output:** `Consignee:`
-- **Cause:** In Layout 2 (Two-Column format), the left column contains `Buyer / Consignee:` followed by the party name, while the right column contains `Invoice Number:`. EasyOCR line sorting merged the two headers onto successive lines (`Buyer\nConsignee:\nInvoice Number: ...`), causing the baseline regex to capture `Consignee:` as the party name.
-
-### Case 5: Word Boundary Truncation in Multi-Word Entities
-- **Document:** `inv_045.png` (Test Split)
-- **Field:** `party`
-- **Ground Truth:** `Larsen & Toubro Heavy Cargo`
-- **Tuned Regex Output:** `Larsen & Toubro Heavy`
-- **Cause:** EasyOCR split the trailing word `Cargo` into a distinct bounding box with higher vertical spacing. The strict string match failed, though lenient substring matching correctly flagged it as a match.
-
-### Case 6: Fields Not Handled by Heuristic Architecture
-- **Fields:** `invoice_date`, `gstin`, `hs_code`
-- **Accuracy:** `0.0%`
-- **Cause:** Architectural limitation. `_fallback_regex_parse` in the current codebase only implements extraction rules for `invoice_no`, `total_amount`, and `party`. It does not contain regex patterns or validation logic for dates, 15-character GSTIN codes, or 4-digit HS codes.
-
----
-
-## 5. Limitations
-
-1. **Synthetic Nature of Dataset:** The dataset is synthetic and generated from 3 distinct templates using Pillow. While noise, rotation, and compression were applied, real-world supplier invoices exhibit higher variance in font, background contrast, scan skew, multi-page continuation, and stamp/signature occlusion.
-2. **EasyOCR CPU Bottleneck:** EasyOCR running on CPU averaged ~4.8 seconds per page. In production, this step dominates latency unless accelerated by GPU or an external cloud OCR API.
-3. **Absence of Gemini Empirical Data:** Due to an invalid API key, Gemini 2.5 Flash numbers could not be empirically measured. The comparison demonstrates the ceiling of rule-based regex parsing, particularly when encountering unseen wording or multi-column layouts.
+1. **The data is synthetic.** Real invoices vary far more (stamps, handwriting, multi-page, low-quality scans). Real redacted invoices should be added as a separate table.
+2. **Gemini is not measured.** Next step: a working key, then `run_eval.py --method gemini` on the **holdout** and **test** sets with no prompt changes, and report both.
+3. **No further regex tuning against layout 4.** If the regex is changed, generate a new layout 5 to measure it.
+4. **One run per configuration.** OCR is deterministic for a fixed image, so the only run-to-run variation is Gemini's, which is not measured yet.

@@ -1,29 +1,15 @@
 package com.logisticsauto.api.service;
 
-import com.logisticsauto.api.config.AppProperties;
 import com.logisticsauto.api.web.exception.BadRequestException;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-@Service
-public class FileStorageService {
+public final class StorageValidationUtils {
 
-    private final AppProperties appProperties;
+    private StorageValidationUtils() {}
 
-    public FileStorageService(AppProperties appProperties) {
-        this.appProperties = appProperties;
-    }
-
-    public record StoredFile(String uid, String filePath, String originalFilename) {}
-
-    public StoredFile save(MultipartFile file) {
+    public static String validateAndGenerateUid(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("File is empty");
         }
@@ -56,16 +42,6 @@ public class FileStorageService {
             ext = candidateExt.toLowerCase();
         }
 
-        String uid = UUID.randomUUID().toString().replace("-", "") + ext;
-
-        try {
-            Path dir = Paths.get(appProperties.uploadDir());
-            Files.createDirectories(dir);
-            Path target = dir.resolve(uid);
-            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-            return new StoredFile(uid, target.toString(), originalFilename);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store uploaded file", e);
-        }
+        return UUID.randomUUID().toString().replace("-", "") + ext;
     }
 }

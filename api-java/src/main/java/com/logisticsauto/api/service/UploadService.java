@@ -26,7 +26,7 @@ public class UploadService {
 
     private static final Logger log = LoggerFactory.getLogger(UploadService.class);
 
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
     private final DocumentRepository documentRepository;
     private final JobPublisher jobPublisher;
     private final AppProperties appProperties;
@@ -37,13 +37,13 @@ public class UploadService {
     private final Timer jobPublishTimer;
 
     public UploadService(
-            FileStorageService fileStorageService,
+            StorageService storageService,
             DocumentRepository documentRepository,
             JobPublisher jobPublisher,
             AppProperties appProperties,
             MeterRegistry meterRegistry
     ) {
-        this.fileStorageService = fileStorageService;
+        this.storageService = storageService;
         this.documentRepository = documentRepository;
         this.jobPublisher = jobPublisher;
         this.appProperties = appProperties;
@@ -69,9 +69,9 @@ public class UploadService {
     }
 
     public UploadResponse upload(MultipartFile file) {
-        FileStorageService.StoredFile storedFile;
+        StorageService.StoredFile storedFile;
         try {
-            storedFile = fileStorageService.save(file);
+            storedFile = storageService.save(file);
         } catch (BadRequestException e) {
             rejectedUploads.increment();
             throw e;
@@ -95,7 +95,8 @@ public class UploadService {
             Map<String, String> payload = Map.of(
                     "job_id", jobId,
                     "document_id", String.valueOf(doc.getId()),
-                    "file_path", storedFile.filePath(),
+                    "file_path", storedFile.filePath() != null ? storedFile.filePath() : "",
+                    "storage_uri", storedFile.storageUri() != null ? storedFile.storageUri() : "",
                     "attempt", "1",
                     "enqueued_at", Instant.now().toString()
             );

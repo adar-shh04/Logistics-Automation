@@ -1,0 +1,105 @@
+# =============================================================================
+# Production Docker Compose Configuration
+#
+# Differences from local development:
+# 1. Images pulled from Amazon ECR (no local builds on host).
+# 2. Real AWS S3 object storage (no LocalStack/MinIO).
+# 3. Frontend served via Nginx reverse proxy on port 80 (API not directly exposed).
+# 4. Strict lockdown: API key enforced, upload rate-limited, /actuator blocked.
+# 5. Secrets (DB password, Gemini key, API key) injected from SSM Parameter Store.
+# 6. Database: either containerized PostgreSQL or managed AWS RDS.
+# =============================================================================
+
+services:
+  # Optional container database if RDS is disabled (use_rds=false)
+  db:
+    image: postgres:15
+    container_name: prod_logistics_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-trade_db}
+    volumes:
+      - prod_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-trade_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: prod_logistics_redis
+    volumes:
+      - prod_redis_data:/data
+    restart: always
+
+  api:
+    image: ${ECR_REGISTRY}/logistics-api:${IMAGE_TAG:-latest}
+    container_name: prod_logistics_api
+    environment:
+      - DATABASE_URL_JDBC=${DATABASE_URL_JDBC:-jdbc:postgresql://db:5432/trade_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - STORAGE_TYPE=s3
+      - S3_BUCKET=${S3_BUCKET}
+      - AWS_REGION=${AWS_REGION:-ap-south-1}
+      - APP_API_KEY=${APP_API_KEY}
+      - RATE_LIMIT_ENABLED=true
+      - UPLOAD_RATE_LIMIT_PER_MINUTE=10
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/actuator/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    depends_on:
+      redis:
+        condition: service_started
+    restart: always
+
+  worker:
+    image: ${ECR_REGISTRY}/logistics-worker:${IMAGE_TAG:-latest}
+    command: python -m app.stream_worker
+    container_name: prod_logistics_worker
+    volumes:
+      - prod_worker_models:/app/models
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@db:5432/trade_db}
+      - REDIS_URL=redis://redis:6379/0
+      - HS_CSV=/app/hsdata/hs_codes.csv
+      - LEDGER_FILE=/app/models/ledger.txt
+      - S3_BUCKET=${S3_BUCKET}
+      - AWS_REGION=${AWS_REGION:-ap-south-1}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      redis:
+        condition: service_started
+      api:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    image: ${ECR_REGISTRY}/logistics-frontend:${IMAGE_TAG:-latest}
+    container_name: prod_logistics_frontend
+    ports:
+      - "80:80"
+    environment:
+      # Rendered into the nginx config at start-up (see nginx.conf.template).
+      - APP_API_KEY=${APP_API_KEY}
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  prod_db_data:
+  prod_redis_data:
+  prod_worker_models:

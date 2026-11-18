@@ -21,7 +21,20 @@ spring:
 
 app:
   upload-dir: ${UPLOAD_DIR:/data/uploads}
-  jobs-stream: logistics:jobs
+  jobs-stream: ${JOBS_STREAM:logistics:jobs}
+  security:
+    api-key: ${APP_API_KEY:}
+    rate-limit-enabled: ${RATE_LIMIT_ENABLED:false}
+    upload-rate-limit-per-minute: ${UPLOAD_RATE_LIMIT_PER_MINUTE:10}
+  storage:
+    type: ${STORAGE_TYPE:s3}
+    s3:
+      bucket: ${S3_BUCKET:logistics-uploads}
+      region: ${AWS_REGION:ap-south-1}
+      endpoint: ${S3_ENDPOINT_URL:http://localstack:4566}
+      path-style-access: ${S3_PATH_STYLE_ACCESS:true}
+      access-key: ${AWS_ACCESS_KEY_ID:test}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:test}
 
 server:
   port: 8000
