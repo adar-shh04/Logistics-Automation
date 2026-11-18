@@ -60,31 +60,60 @@ def parse_with_regex(text: str) -> Dict:
     """
     Extracts invoice fields using regex heuristics.
     Extracts invoice_no, total_amount, and party.
+    Tuned on dev split to handle common OCR noise (e.g. ₹ read as {),
+    currency prefixes (Rs., INR), and multi-line party blocks.
     """
     fields: Dict = {}
     normalized_text = text.replace("\r", "\n")
-    
-    m = re.search(r'(Invoice|Inv\.?|Tax Invoice)\s*(No|#|Number)[:\s]*([A-Za-z0-9\/\-\._]+)', normalized_text, re.I)
+    lines = [l.strip() for l in normalized_text.splitlines() if l.strip()]
+
+    # 1. Invoice Number (require delimiter like ':', '#', or '.')
+    m = re.search(
+        r'(?:Invoice|Inv\.?|Tax\s*Invoice|Bill)\s*(?:No\.?|#|Number)?\s*[:#\.]\s*([A-Za-z0-9\/\-\._]+)',
+        normalized_text,
+        re.I
+    )
+    if not m:
+        m = re.search(r'(?:Invoice|Inv\.?|Tax\s*Invoice)\s*(?:No|#|Number)[:\s]+([A-Za-z0-9\/\-\._]+)', normalized_text, re.I)
     if m:
-        fields['invoice_no'] = m.group(3).strip()
-    
-    m = re.search(r'(Total\s*Amount|Invoice\s*Total|Amount\s*Due|Grand Total|Total)[:\s]*₹?\s*([0-9\.,]+)', normalized_text, re.I)
+        fields['invoice_no'] = m.group(1).strip()
+
+    # 2. Total Amount (handles ₹, Rs., INR, or OCR-corrupted { /[ currency symbols)
+    m = re.search(
+        r'(?:Total\s*Amount|Invoice\s*Total|Amount\s*Due|Grand\s*Total|Amount\s*Payable|Total)[:\s]*\n?\s*(?:₹|Rs\.?|INR|\$|{|\[)?\s*([0-9\.,]+)',
+        normalized_text,
+        re.I
+    )
     if m:
-        amt = m.group(2).replace(",", "").strip()
+        amt_str = m.group(1).replace(",", "").strip()
         try:
-            fields['total_amount'] = float(amt)
+            fields['total_amount'] = float(amt_str)
         except (ValueError, TypeError):
             pass
-            
-    m = re.search(r'(Bill To|Buyer|Consignee)(:|\s+)\n?(.{2,120})', normalized_text, re.I)
-    if m:
-        fields['party'] = m.group(3).strip().split("\n")[0]
-        
+
+    # 3. Party extraction: look for party after Bill To / Buyer / Consignee header
+    for idx, line in enumerate(lines):
+        if re.search(r'^(?:Bill To|Buyer|Consignee|Customer Name|Party)[\s/:]*$', line, re.I):
+            # Inspect following lines to find actual company name
+            for next_line in lines[idx + 1: idx + 4]:
+                if re.match(r'^(?:Consignee|GSTIN|Place of|Invoice|Date|Tax ID|Destination|Item)', next_line, re.I):
+                    continue
+                fields['party'] = next_line
+                break
+            if 'party' in fields:
+                break
+
+    # Fallback party lookup if structured block not found
     if 'party' not in fields:
-        lines = [l.strip() for l in normalized_text.splitlines() if l.strip()]
-        if lines:
-            fields.setdefault('party', lines[0][:150])
-            
+        m = re.search(r'(?:Bill To|Buyer|Consignee|Customer Name)(?::|\s+)\n?(.{2,120})', normalized_text, re.I)
+        if m:
+            candidate = m.group(1).strip().split("\n")[0]
+            if not re.match(r'^(?:Consignee|GSTIN|Invoice)', candidate, re.I):
+                fields['party'] = candidate
+
+    if 'party' not in fields and lines:
+        fields['party'] = lines[0][:150]
+
     return fields
 
 # Backward-compatibility alias

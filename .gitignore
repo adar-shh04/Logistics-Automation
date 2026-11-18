@@ -56,3 +56,7 @@ Thumbs.db
 target/
 api-java/target/
 *.class
+
+# Evaluation cache
+eval/.cache/
+eval/cache/

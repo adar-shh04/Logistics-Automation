@@ -1,0 +1,1329 @@
+{
+  "metadata": {
+    "date": "2026-11-18 19:26:59",
+    "method": "regex",
+    "split": "test",
+    "dataset_count": 40,
+    "labels_path": "X:\\projects\\Logistics-Automation\\eval\\data\\synthetic\\labels.jsonl",
+    "python_version": "3.14.3",
+    "platform": "win32"
+  },
+  "metrics": {
+    "count": 40,
+    "field_metrics": {
+      "invoice_no": {
+        "correct": 24,
+        "total": 40,
+        "accuracy": 0.6,
+        "ci_95": [
+          0.446,
+          0.7365
+        ]
+      },
+      "invoice_date": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      },
+      "total_amount": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      },
+      "gstin": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      },
+      "hs_code": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      },
+      "party_strict": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      },
+      "party_lenient": {
+        "correct": 0,
+        "total": 40,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.0876
+        ]
+      }
+    },
+    "document_level": {
+      "correct": 0,
+      "total": 40,
+      "accuracy": 0.0,
+      "ci_95": [
+        0.0,
+        0.0876
+      ]
+    }
+  },
+  "timing": {
+    "ocr_p50": 4.7755,
+    "ocr_p95": 5.2624,
+    "parse_p50": 0.0001,
+    "parse_p95": 0.0001,
+    "measured_ocr_runs": 40,
+    "measured_parse_runs": 40
+  },
+  "errors": {
+    "count": 0,
+    "details": []
+  },
+  "document_results": [
+    {
+      "file": "inv_021.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "rthern",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_021.png",
+        "split": "test",
+        "invoice_no": "INV-2026-9270",
+        "invoice_date": "2026-04-28",
+        "total_amount": 743400.0,
+        "gstin": "27VSMPY1145T1ZK",
+        "hs_code": "8542",
+        "party": "Delhivery Supply Chain Operations"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.7087,
+      "parse_time_seconds": 0.0008,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_022.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/7275",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_022.png",
+        "split": "test",
+        "invoice_no": "TX/26/7275",
+        "invoice_date": "2026-03-11",
+        "total_amount": 13570.0,
+        "gstin": "27WGUMF4723T1Z5",
+        "hs_code": "0201",
+        "party": "Larsen & Toubro Heavy Cargo"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.0342,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_023.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_023.png",
+        "split": "test",
+        "invoice_no": "BILL-9947",
+        "invoice_date": "2026-04-18",
+        "total_amount": 11200.0,
+        "gstin": "33KUYAX5492N1ZQ",
+        "hs_code": "2710",
+        "party": "Blue Dart Express Cargo"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.8777,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_024.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-6355",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_024.png",
+        "split": "test",
+        "invoice_no": "INV-2026-6355",
+        "invoice_date": "2026-03-15",
+        "total_amount": 554400.0,
+        "gstin": "27ZNXQR0481J1ZO",
+        "hs_code": "0302",
+        "party": "Hero FinCorp Freight Depot"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2407,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_025.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/3068",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_025.png",
+        "split": "test",
+        "invoice_no": "TX/26/3068",
+        "invoice_date": "2026-03-11",
+        "total_amount": 252000.0,
+        "gstin": "33ANZJR7679G1Z1",
+        "hs_code": "2710",
+        "party": "Reliance Logistics & Distribution"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.0389,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_026.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_026.png",
+        "split": "test",
+        "invoice_no": "BILL-4978",
+        "invoice_date": "2026-03-14",
+        "total_amount": 67200.0,
+        "gstin": "24QTCVZ1036N1ZP",
+        "hs_code": "8471",
+        "party": "Adani Ports & Special Economic Zone"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.9634,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_027.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-9548",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_027.png",
+        "split": "test",
+        "invoice_no": "INV-2026-9548",
+        "invoice_date": "2026-03-13",
+        "total_amount": 30975.0,
+        "gstin": "33RBRAL4438Q1Z9",
+        "hs_code": "1006",
+        "party": "ITC Agri Logistics Network"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2235,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_028.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/5526",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_028.png",
+        "split": "test",
+        "invoice_no": "TX/26/5526",
+        "invoice_date": "2026-03-19",
+        "total_amount": 5310.0,
+        "gstin": "07GLUPS3434M1ZG",
+        "hs_code": "0302",
+        "party": "Delhivery Supply Chain Operations"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6458,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_029.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_029.png",
+        "split": "test",
+        "invoice_no": "BILL-8434",
+        "invoice_date": "2026-03-24",
+        "total_amount": 12600.0,
+        "gstin": "19MVCFS3545P1ZZ",
+        "hs_code": "0302",
+        "party": "Bharat Heavy Electricals Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6936,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_030.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-1893",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_030.png",
+        "split": "test",
+        "invoice_no": "INV-2026-1893",
+        "invoice_date": "2026-03-19",
+        "total_amount": 26550.0,
+        "gstin": "19MTZNG1121A1ZY",
+        "hs_code": "0201",
+        "party": "Blue Dart Express Cargo"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2478,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_031.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/5978",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_031.png",
+        "split": "test",
+        "invoice_no": "TX/26/5978",
+        "invoice_date": "2026-03-11",
+        "total_amount": 1575.0,
+        "gstin": "24GMJZG8104U1Z3",
+        "hs_code": "0201",
+        "party": "Acme Industrial Logistics Pvt Ltd"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.9571,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_032.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_032.png",
+        "split": "test",
+        "invoice_no": "BILL-2229",
+        "invoice_date": "2026-03-17",
+        "total_amount": 1680.0,
+        "gstin": "33HQLPB9076J1Z5",
+        "hs_code": "0201",
+        "party": "Hero FinCorp Freight Depot"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.4964,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_033.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-3441",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_033.png",
+        "split": "test",
+        "invoice_no": "INV-2026-3441",
+        "invoice_date": "2026-04-05",
+        "total_amount": 425250.0,
+        "gstin": "27GGWBF2758G1ZR",
+        "hs_code": "0101",
+        "party": "Vanguard Maritime Services"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.1955,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_034.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/1339",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_034.png",
+        "split": "test",
+        "invoice_no": "TX/26/1339",
+        "invoice_date": "2026-03-16",
+        "total_amount": 420000.0,
+        "gstin": "33SSYNM0043J1Z1",
+        "hs_code": "0101",
+        "party": "Mahindra Logistics Solutions"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.7171,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_035.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_035.png",
+        "split": "test",
+        "invoice_no": "BILL-9117",
+        "invoice_date": "2026-03-28",
+        "total_amount": 168000.0,
+        "gstin": "19LGZLV9443D1ZA",
+        "hs_code": "0302",
+        "party": "Apollo Tyres National Depot"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6191,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_036.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-5375",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_036.png",
+        "split": "test",
+        "invoice_no": "INV-2026-5375",
+        "invoice_date": "2026-03-05",
+        "total_amount": 10080.0,
+        "gstin": "07ZKNZR5413R1ZS",
+        "hs_code": "8542",
+        "party": "Godrej Consumer Distribution Hub"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.0418,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_037.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/5781",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_037.png",
+        "split": "test",
+        "invoice_no": "TX/26/5781",
+        "invoice_date": "2026-04-30",
+        "total_amount": 285600.0,
+        "gstin": "19QFDPP0994D1Z9",
+        "hs_code": "1006",
+        "party": "Acme Industrial Logistics Pvt Ltd"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.7972,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_038.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_038.png",
+        "split": "test",
+        "invoice_no": "BILL-5891",
+        "invoice_date": "2026-03-02",
+        "total_amount": 190570.0,
+        "gstin": "24DEQTD0783S1ZH",
+        "hs_code": "8542",
+        "party": "Hero FinCorp Freight Depot"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.5607,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_039.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "rthern",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_039.png",
+        "split": "test",
+        "invoice_no": "INV-2026-7246",
+        "invoice_date": "2026-04-01",
+        "total_amount": 230100.0,
+        "gstin": "29PPLHE6527B1ZK",
+        "hs_code": "8471",
+        "party": "Infosys BPM Global Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2624,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_040.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/7512",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_040.png",
+        "split": "test",
+        "invoice_no": "TX/26/7512",
+        "invoice_date": "2026-03-18",
+        "total_amount": 5880.0,
+        "gstin": "24HCWCX0189C1ZU",
+        "hs_code": "8542",
+        "party": "Apollo Tyres National Depot"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.617,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_041.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_041.png",
+        "split": "test",
+        "invoice_no": "BILL-1919",
+        "invoice_date": "2026-03-04",
+        "total_amount": 14000.0,
+        "gstin": "07FSGFC9771F1ZJ",
+        "hs_code": "0101",
+        "party": "Havells Electrical Logistics"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.413,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_042.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-2210",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_042.png",
+        "split": "test",
+        "invoice_no": "INV-2026-2210",
+        "invoice_date": "2026-04-05",
+        "total_amount": 22125.0,
+        "gstin": "07QKSMP2646Q1ZI",
+        "hs_code": "8471",
+        "party": "Adani Ports & Special Economic Zone"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.3072,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_043.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/1803",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_043.png",
+        "split": "test",
+        "invoice_no": "TX/26/1803",
+        "invoice_date": "2026-03-02",
+        "total_amount": 336000.0,
+        "gstin": "29EKMFP5929X1ZP",
+        "hs_code": "0302",
+        "party": "Hero FinCorp Freight Depot"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6968,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_044.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_044.png",
+        "split": "test",
+        "invoice_no": "BILL-3153",
+        "invoice_date": "2026-03-25",
+        "total_amount": 4200.0,
+        "gstin": "19EGUUS1060Q1Z2",
+        "hs_code": "2710",
+        "party": "Delhivery Supply Chain Operations"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.4965,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_045.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-6992",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_045.png",
+        "split": "test",
+        "invoice_no": "INV-2026-6992",
+        "invoice_date": "2026-04-22",
+        "total_amount": 151200.0,
+        "gstin": "33ZHWVM0726X1ZP",
+        "hs_code": "8542",
+        "party": "Larsen & Toubro Heavy Cargo"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.9432,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_046.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/3290",
+        "party": "/ Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_046.png",
+        "split": "test",
+        "invoice_no": "TX/26/3290",
+        "invoice_date": "2026-03-28",
+        "total_amount": 560.0,
+        "gstin": "29CFAXP9208Y1ZJ",
+        "hs_code": "8471",
+        "party": "Bharat Heavy Electricals Freight"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6035,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_047.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_047.png",
+        "split": "test",
+        "invoice_no": "BILL-8264",
+        "invoice_date": "2026-03-25",
+        "total_amount": 8400.0,
+        "gstin": "19YSNQT8686J1Z2",
+        "hs_code": "8471",
+        "party": "Infosys BPM Global Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.5655,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_048.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-4362",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_048.png",
+        "split": "test",
+        "invoice_no": "INV-2026-4362",
+        "invoice_date": "2026-04-21",
+        "total_amount": 159300.0,
+        "gstin": "33GZYVC2690L1ZF",
+        "hs_code": "0201",
+        "party": "Vanguard Maritime Services"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2193,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_049.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/6304",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_049.png",
+        "split": "test",
+        "invoice_no": "TX/26/6304",
+        "invoice_date": "2026-04-21",
+        "total_amount": 560.0,
+        "gstin": "27UQGZZ5718E1Z0",
+        "hs_code": "0302",
+        "party": "Crompton Greaves Freight"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.5453,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_050.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_050.png",
+        "split": "test",
+        "invoice_no": "BILL-7984",
+        "invoice_date": "2026-04-25",
+        "total_amount": 6160.0,
+        "gstin": "29NCNYB7854A1Z3",
+        "hs_code": "1006",
+        "party": "Crompton Greaves Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.3801,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_051.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-8046",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_051.png",
+        "split": "test",
+        "invoice_no": "INV-2026-8046",
+        "invoice_date": "2026-04-26",
+        "total_amount": 8400.0,
+        "gstin": "24RPHZN4607W1ZZ",
+        "hs_code": "8471",
+        "party": "Larsen & Toubro Heavy Cargo"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.1017,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_052.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/1982",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_052.png",
+        "split": "test",
+        "invoice_no": "TX/26/1982",
+        "invoice_date": "2026-03-10",
+        "total_amount": 190570.0,
+        "gstin": "07HHGYS4004Z1ZN",
+        "hs_code": "8542",
+        "party": "Voltas Commercial Cargo Hub"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.9651,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_053.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_053.png",
+        "split": "test",
+        "invoice_no": "BILL-2882",
+        "invoice_date": "2026-04-06",
+        "total_amount": 36875.0,
+        "gstin": "33WTZQJ5262D1ZM",
+        "hs_code": "8542",
+        "party": "Kalyani Steels Transport Division"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.477,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_054.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-7163",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_054.png",
+        "split": "test",
+        "invoice_no": "INV-2026-7163",
+        "invoice_date": "2026-04-04",
+        "total_amount": 53312.0,
+        "gstin": "27GUYJE1607A1Z5",
+        "hs_code": "8471",
+        "party": "Acme Industrial Logistics Pvt Ltd"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.1128,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_055.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/8972",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_055.png",
+        "split": "test",
+        "invoice_no": "TX/26/8972",
+        "invoice_date": "2026-03-20",
+        "total_amount": 285600.0,
+        "gstin": "27UBBLL6425M1ZR",
+        "hs_code": "0101",
+        "party": "Tata Steel Processing & Distribution Ltd"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.6234,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_056.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_056.png",
+        "split": "test",
+        "invoice_no": "BILL-1693",
+        "invoice_date": "2026-03-27",
+        "total_amount": 3920.0,
+        "gstin": "27UGCML1525X1ZM",
+        "hs_code": "0101",
+        "party": "Crompton Greaves Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.578,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_057.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "rthern",
+        "party": "/ Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_057.png",
+        "split": "test",
+        "invoice_no": "INV-2026-9584",
+        "invoice_date": "2026-04-08",
+        "total_amount": 11424.0,
+        "gstin": "19LCAHV6890D1ZF",
+        "hs_code": "1006",
+        "party": "Thermax Industrial Shipping"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.7538,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_058.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "TX/26/8601",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_058.png",
+        "split": "test",
+        "invoice_no": "TX/26/8601",
+        "invoice_date": "2026-04-11",
+        "total_amount": 250750.0,
+        "gstin": "29JYRDC2117C1ZB",
+        "hs_code": "8542",
+        "party": "Crompton Greaves Freight"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.7289,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_059.png",
+      "method": "regex",
+      "prediction": {
+        "party": "BILL OF SUPPLY"
+      },
+      "ground_truth": {
+        "file": "inv_059.png",
+        "split": "test",
+        "invoice_no": "BILL-9307",
+        "invoice_date": "2026-04-26",
+        "total_amount": 52156.0,
+        "gstin": "33BLHGB5340K1Z4",
+        "hs_code": "8471",
+        "party": "Tata Steel Processing & Distribution Ltd"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.5782,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "inv_060.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "INV-2026-3600",
+        "party": "Consignee:"
+      },
+      "ground_truth": {
+        "file": "inv_060.png",
+        "split": "test",
+        "invoice_no": "INV-2026-3600",
+        "invoice_date": "2026-04-04",
+        "total_amount": 16800.0,
+        "gstin": "33NYLVW9060Y1ZS",
+        "hs_code": "1006",
+        "party": "Havells Electrical Logistics"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.1008,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    }
+  ]
+}
