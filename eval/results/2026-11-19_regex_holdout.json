@@ -1,0 +1,1318 @@
+{
+  "metadata": {
+    "date": "2026-11-19 00:49:14",
+    "method": "regex",
+    "split": "holdout",
+    "dataset_count": 30,
+    "labels_path": "eval/data/holdout/labels.jsonl",
+    "python_version": "3.14.3",
+    "platform": "win32"
+  },
+  "metrics": {
+    "count": 30,
+    "field_metrics": {
+      "invoice_no": {
+        "correct": 8,
+        "total": 30,
+        "accuracy": 0.2667,
+        "ci_95": [
+          0.1418,
+          0.4445
+        ]
+      },
+      "invoice_date": {
+        "correct": 0,
+        "total": 30,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "total_amount": {
+        "correct": 6,
+        "total": 30,
+        "accuracy": 0.2,
+        "ci_95": [
+          0.0951,
+          0.3731
+        ]
+      },
+      "gstin": {
+        "correct": 0,
+        "total": 30,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "hs_code": {
+        "correct": 0,
+        "total": 30,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "party_strict": {
+        "correct": 0,
+        "total": 30,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "party_lenient": {
+        "correct": 0,
+        "total": 30,
+        "accuracy": 0.0,
+        "ci_95": [
+          0.0,
+          0.1135
+        ]
+      }
+    },
+    "document_level": {
+      "correct": 0,
+      "total": 30,
+      "accuracy": 0.0,
+      "ci_95": [
+        0.0,
+        0.1135
+      ]
+    }
+  },
+  "timing": {
+    "ocr_p50": 6.3869,
+    "ocr_p95": 8.2687,
+    "parse_p50": 0.0002,
+    "parse_p95": 0.0002,
+    "measured_ocr_runs": 30,
+    "measured_parse_runs": 30
+  },
+  "errors": {
+    "count": 0,
+    "details": []
+  },
+  "document_results": [
+    {
+      "file": "hold_001.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_001.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Date of Issue:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "HSN Code",
+          "total": "TOTAL (INR):",
+          "currency": "INR "
+        },
+        "invoice_no": "FRT/26-1422",
+        "invoice_date": "2026-05-02",
+        "total_amount": 3830.4,
+        "gstin": "24RYXXQ4587R1ZS",
+        "hs_code": "0201",
+        "party": "Apollo Tyres National Depot"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.7463,
+      "parse_time_seconds": 0.0036,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_002.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_002.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Date of Issue:",
+          "party": "Billed To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Commodity Code",
+          "total": "TOTAL (INR):",
+          "currency": ""
+        },
+        "invoice_no": "1585/26-27",
+        "invoice_date": "2026-06-30",
+        "total_amount": 532000.0,
+        "gstin": "24RTCNG1673Y1ZN",
+        "hs_code": "0302",
+        "party": "Voltas Commercial Cargo Hub"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.6565,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_003.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_003.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Dated:",
+          "party": "Billed To:",
+          "gstin": "GST No.:",
+          "hs": "HSN Code",
+          "total": "TOTAL (INR):",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "9039/26-27",
+        "invoice_date": "2026-07-01",
+        "total_amount": 271872.0,
+        "gstin": "27UVZNS7418D1ZT",
+        "hs_code": "8471",
+        "party": "Maruti Suzuki Central Spares"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 8.2687,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_004.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FRT/26-7520",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_004.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Dated:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "Tariff Code",
+          "total": "Invoice Value:",
+          "currency": "Rs "
+        },
+        "invoice_no": "FRT/26-7520",
+        "invoice_date": "2026-07-06",
+        "total_amount": 1191680.0,
+        "gstin": "29SMUML6024D1ZS",
+        "hs_code": "8471",
+        "party": "Blue Dart Express Cargo"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.6655,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_005.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_005.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Dated:",
+          "party": "Sold To:",
+          "gstin": "GST Reg. No.:",
+          "hs": "Commodity Code",
+          "total": "TOTAL (INR):",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "FI9652",
+        "invoice_date": "2026-05-02",
+        "total_amount": 1434880.0,
+        "gstin": "33PYBVF6796W1ZM",
+        "hs_code": "0201",
+        "party": "Acme Industrial Logistics Pvt Ltd"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.4097,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_006.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "8462/26-27",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_006.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Issue Date:",
+          "party": "Billed To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Commodity Code",
+          "total": "Balance Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "8462/26-27",
+        "invoice_date": "2026-05-05",
+        "total_amount": 893760.0,
+        "gstin": "29NKDVK9308W1ZM",
+        "hs_code": "8542",
+        "party": "Maruti Suzuki Central Spares"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.8603,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_007.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_007.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Issue Date:",
+          "party": "Sold To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "HSN Code",
+          "total": "Invoice Value:",
+          "currency": ""
+        },
+        "invoice_no": "FI8027",
+        "invoice_date": "2026-07-23",
+        "total_amount": 1770.0,
+        "gstin": "29MFTPA6169B1ZS",
+        "hs_code": "8542",
+        "party": "Havells Electrical Logistics"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.5258,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_008.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_008.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Date of Issue:",
+          "party": "Sold To:",
+          "gstin": "GST No.:",
+          "hs": "HSN Code",
+          "total": "Balance Due:",
+          "currency": "INR "
+        },
+        "invoice_no": "FRT/26-3890",
+        "invoice_date": "2026-05-14",
+        "total_amount": 45312.0,
+        "gstin": "29EMZVG1545S1ZH",
+        "hs_code": "8542",
+        "party": "Adani Ports & Special Economic Zone"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.0089,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_009.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "F15936",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_009.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Dated:",
+          "party": "Ship To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "HSN Code",
+          "total": "Balance Due:",
+          "currency": "INR "
+        },
+        "invoice_no": "FI5936",
+        "invoice_date": "2026-07-28",
+        "total_amount": 538080.0,
+        "gstin": "19GUTPP6170P1ZA",
+        "hs_code": "0101",
+        "party": "Havells Electrical Logistics"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.697,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_010.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FI3632",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_010.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Date of Issue:",
+          "party": "Recipient:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "HSN Code",
+          "total": "TOTAL (INR):",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "FI3632",
+        "invoice_date": "2026-06-11",
+        "total_amount": 226560.0,
+        "gstin": "07FHCPZ8346Y1Z2",
+        "hs_code": "1006",
+        "party": "Vanguard Maritime Services"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 7.1934,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_011.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FRT/26-2110",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_011.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Issue Date:",
+          "party": "Billed To:",
+          "gstin": "GST Reg. No.:",
+          "hs": "Tariff Code",
+          "total": "TOTAL (INR):",
+          "currency": ""
+        },
+        "invoice_no": "FRT/26-2110",
+        "invoice_date": "2026-05-16",
+        "total_amount": 2655.0,
+        "gstin": "19HTUXH4509G1ZZ",
+        "hs_code": "0101",
+        "party": "Sundaram Fasteners Supply Chain"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.0353,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_012.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FRT/26-9826",
+        "total_amount": 157500.0,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_012.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Date of Issue:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "Commodity Code",
+          "total": "Net Amount Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "FRT/26-9826",
+        "invoice_date": "2026-05-19",
+        "total_amount": 157500.0,
+        "gstin": "24ATNPX7205P1ZG",
+        "hs_code": "0302",
+        "party": "Adani Ports & Special Economic Zone"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2141,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_013.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_013.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Document No:",
+          "date": "Date of Issue:",
+          "party": "Sold To:",
+          "gstin": "GST No.:",
+          "hs": "HSN Code",
+          "total": "TOTAL (INR):",
+          "currency": "INR "
+        },
+        "invoice_no": "FRT/26-6826",
+        "invoice_date": "2026-05-22",
+        "total_amount": 6451.2,
+        "gstin": "33SJUPG8344R1ZJ",
+        "hs_code": "0201",
+        "party": "Voltas Commercial Cargo Hub"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.1119,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_014.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "Fl9811",
+        "total_amount": 10920.0,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_014.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Dated:",
+          "party": "Sold To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Tariff Code",
+          "total": "Net Amount Due:",
+          "currency": ""
+        },
+        "invoice_no": "FI9811",
+        "invoice_date": "2026-06-10",
+        "total_amount": 10920.0,
+        "gstin": "07YKZNR1507L1ZZ",
+        "hs_code": "0302",
+        "party": "Maruti Suzuki Central Spares"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 4.9418,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_015.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FI2626",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_015.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Dated:",
+          "party": "Ship To:",
+          "gstin": "GST Reg. No.:",
+          "hs": "Tariff Code",
+          "total": "Invoice Value:",
+          "currency": "INR "
+        },
+        "invoice_no": "FI2626",
+        "invoice_date": "2026-05-29",
+        "total_amount": 31500.0,
+        "gstin": "24AHDAC6778C1ZN",
+        "hs_code": "0302",
+        "party": "Voltas Commercial Cargo Hub"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.2987,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_016.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "2858/26-27",
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_016.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Date of Issue:",
+          "party": "Billed To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "HSN Code",
+          "total": "Balance Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "2858/26-27",
+        "invoice_date": "2026-07-25",
+        "total_amount": 413000.0,
+        "gstin": "33CNVSL5070R1ZJ",
+        "hs_code": "0302",
+        "party": "TVS Supply Chain Solutions"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.7517,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_017.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_017.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Document No:",
+          "date": "Dated:",
+          "party": "Recipient:",
+          "gstin": "GST Reg. No.:",
+          "hs": "HSN Code",
+          "total": "Invoice Value:",
+          "currency": ""
+        },
+        "invoice_no": "FI2481",
+        "invoice_date": "2026-06-27",
+        "total_amount": 15120.0,
+        "gstin": "29KVKDT6128L1ZH",
+        "hs_code": "8542",
+        "party": "Crompton Greaves Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.238,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_018.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_018.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Dated:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "Tariff Code",
+          "total": "Balance Due:",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "FRT/26-4231",
+        "invoice_date": "2026-06-05",
+        "total_amount": 324500.0,
+        "gstin": "33XWYSP2339Z1ZB",
+        "hs_code": "0101",
+        "party": "Kalyani Steels Transport Division"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.8481,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_019.png",
+      "method": "regex",
+      "prediction": {
+        "total_amount": 4248.0,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_019.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Issue Date:",
+          "party": "Ship To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "HSN Code",
+          "total": "Net Amount Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "FI2898",
+        "invoice_date": "2026-07-18",
+        "total_amount": 4248.0,
+        "gstin": "27UNQJP1791H1ZT",
+        "hs_code": "0201",
+        "party": "Acme Industrial Logistics Pvt Ltd"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 5.8309,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_020.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_020.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Date of Issue:",
+          "party": "Ship To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Tariff Code",
+          "total": "TOTAL (INR):",
+          "currency": ""
+        },
+        "invoice_no": "6121/26-27",
+        "invoice_date": "2026-06-30",
+        "total_amount": 1404480.0,
+        "gstin": "19JJQGX8040M1ZG",
+        "hs_code": "8542",
+        "party": "Kalyani Steels Transport Division"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 8.3344,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_021.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_021.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Dated:",
+          "party": "Billed To:",
+          "gstin": "GST No.:",
+          "hs": "Commodity Code",
+          "total": "TOTAL (INR):",
+          "currency": "INR "
+        },
+        "invoice_no": "FRT/26-7699",
+        "invoice_date": "2026-05-29",
+        "total_amount": 105728.0,
+        "gstin": "19JEZWE2985N1Z6",
+        "hs_code": "2710",
+        "party": "Godrej Consumer Distribution Hub"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 7.3127,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_022.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_022.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Date of Issue:",
+          "party": "Sold To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Commodity Code",
+          "total": "Invoice Value:",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "FRT/26-5943",
+        "invoice_date": "2026-06-05",
+        "total_amount": 23625.0,
+        "gstin": "24PZTDV6060K1ZB",
+        "hs_code": "0201",
+        "party": "Tata Steel Processing & Distribution Ltd"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.521,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_023.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_023.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Issue Date:",
+          "party": "Sold To:",
+          "gstin": "GST No.:",
+          "hs": "Commodity Code",
+          "total": "Invoice Value:",
+          "currency": "Rs "
+        },
+        "invoice_no": "FRT/26-8345",
+        "invoice_date": "2026-05-05",
+        "total_amount": 45312.0,
+        "gstin": "19KXDNM0386J1ZL",
+        "hs_code": "8542",
+        "party": "Kalyani Steels Transport Division"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.4253,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_024.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_024.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Dated:",
+          "party": "Ship To:",
+          "gstin": "GST Reg. No.:",
+          "hs": "Tariff Code",
+          "total": "TOTAL (INR):",
+          "currency": "INR "
+        },
+        "invoice_no": "FRT/26-2689",
+        "invoice_date": "2026-07-27",
+        "total_amount": 10620.0,
+        "gstin": "19FHTYP4821C1ZM",
+        "hs_code": "8471",
+        "party": "Infosys BPM Global Freight"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 7.8198,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_025.png",
+      "method": "regex",
+      "prediction": {
+        "total_amount": 43008.0,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_025.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Document No:",
+          "date": "Dated:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "Tariff Code",
+          "total": "Net Amount Due:",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "5445/26-27",
+        "invoice_date": "2026-07-26",
+        "total_amount": 43008.0,
+        "gstin": "24MGJZC1233W1Z3",
+        "hs_code": "8471",
+        "party": "TVS Supply Chain Solutions"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.8294,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_026.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_026.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Voucher No:",
+          "date": "Issue Date:",
+          "party": "Recipient:",
+          "gstin": "GST Reg. No.:",
+          "hs": "HSN Code",
+          "total": "Balance Due:",
+          "currency": ""
+        },
+        "invoice_no": "FRT/26-8633",
+        "invoice_date": "2026-05-11",
+        "total_amount": 877800.0,
+        "gstin": "19VZQND3031J1Z1",
+        "hs_code": "0101",
+        "party": "Wipro Infrastructure Supply"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 7.8256,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_027.png",
+      "method": "regex",
+      "prediction": {
+        "total_amount": 7660.8,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_027.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Document No:",
+          "date": "Date of Issue:",
+          "party": "Recipient:",
+          "gstin": "GST No.:",
+          "hs": "Commodity Code",
+          "total": "Net Amount Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "4479/26-27",
+        "invoice_date": "2026-07-07",
+        "total_amount": 7660.8,
+        "gstin": "27UQQMA9304E1ZI",
+        "hs_code": "0201",
+        "party": "Hero FinCorp Freight Depot"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.3486,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_028.png",
+      "method": "regex",
+      "prediction": {
+        "invoice_no": "FRT/26-9313",
+        "total_amount": 427750.0,
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_028.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Invoice #:",
+          "date": "Date of Issue:",
+          "party": "Billed To:",
+          "gstin": "GST Reg. No.:",
+          "hs": "Commodity Code",
+          "total": "Net Amount Due:",
+          "currency": "Rs "
+        },
+        "invoice_no": "FRT/26-9313",
+        "invoice_date": "2026-07-21",
+        "total_amount": 427750.0,
+        "gstin": "33ZFBUE2329B1ZD",
+        "hs_code": "8471",
+        "party": "Bajaj Auto Parts Logistics"
+      },
+      "field_scores": {
+        "invoice_no": true,
+        "invoice_date": false,
+        "total_amount": true,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.8936,
+      "parse_time_seconds": 0.0001,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_029.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_029.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Date of Issue:",
+          "party": "Billed To:",
+          "gstin": "GSTIN/UIN:",
+          "hs": "Tariff Code",
+          "total": "Balance Due:",
+          "currency": "\u20b9 "
+        },
+        "invoice_no": "FRT/26-8950",
+        "invoice_date": "2026-07-07",
+        "total_amount": 6796.8,
+        "gstin": "07EBEGR4287F1ZZ",
+        "hs_code": "8471",
+        "party": "Sundaram Fasteners Supply Chain"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.4592,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    },
+    {
+      "file": "hold_030.png",
+      "method": "regex",
+      "prediction": {
+        "party": "FREIGHT INVOICE"
+      },
+      "ground_truth": {
+        "file": "hold_030.png",
+        "split": "holdout",
+        "layout": 4,
+        "label_wording": {
+          "number": "Ref. No.:",
+          "date": "Issue Date:",
+          "party": "Billed To:",
+          "gstin": "GST No.:",
+          "hs": "Commodity Code",
+          "total": "Invoice Value:",
+          "currency": ""
+        },
+        "invoice_no": "FI2540",
+        "invoice_date": "2026-06-02",
+        "total_amount": 17640.0,
+        "gstin": "27PNJGR1037E1ZX",
+        "hs_code": "8542",
+        "party": "Delhivery Supply Chain Operations"
+      },
+      "field_scores": {
+        "invoice_no": false,
+        "invoice_date": false,
+        "total_amount": false,
+        "gstin": false,
+        "hs_code": false,
+        "party_strict": false,
+        "party_lenient": false
+      },
+      "all_correct": false,
+      "ocr_time_seconds": 6.6391,
+      "parse_time_seconds": 0.0002,
+      "ocr_cached": false
+    }
+  ]
+}

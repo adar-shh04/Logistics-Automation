@@ -64,32 +64,31 @@ Executed via Pytest with fakeredis and moto[s3]:
 
 ## 4. Evaluation and Execution Status
 
+### Corrections made on 2026-11-19
+
+An earlier version of this section listed numbers that do not match the raw result files. They are removed. The reports below are the source of truth, and every number in them maps to a file in `eval/results/` or `loadtests/results/`.
+
 ### Part A: Extraction Accuracy Evaluation
-- **Baseline Regex Run (Test split, N = 40):**
-  - Invoice No: 60.0% [44.60%, 73.65%]
-  - Total Amount: 0.0% [0.00%, 8.76%]
-  - Party Strict / Lenient: 0.0% [0.00%, 8.76%]
-  - Document-level accuracy: 0.0%
-- **Tuned Regex Run (Test split, N = 40):**
-  - Invoice No: 85.0% [70.93%, 92.94%]
-  - Total Amount: 97.5% [87.12%, 99.56%]
-  - Party Strict: 85.0% [70.93%, 92.94%]
-  - Party Lenient: 92.5% [80.14%, 97.42%]
-  - Document-level accuracy: 77.5%
-- **Gemini Extraction Evaluation:** Recorded as **not run** because the provided `GEMINI_API_KEY` was rejected by the upstream Google GenAI API with `400 INVALID_ARGUMENT (API key not valid)`. Verified error trapping and non-fallback recording. Full report in `docs/eval/EXTRACTION_REPORT.md`.
+- See `docs/eval/EXTRACTION_REPORT.md`.
+- The 2026-11-18 "tuned regex" test figures (85% / 97.5% / 85%, and a 77.5% document-level figure that no results file supports) were **not held-out**: the regex was tuned with the wording of the test-only layout 3.
+- A blind layout-4 set (30 invoices, `eval/generate_holdout.py`) was generated after the parser was frozen and run once. Regex results on it: invoice number 26.7%, total 20.0%, party 0%.
+- Gemini: **not run** (the API key is invalid).
 
 ### Part B: Observability and Load Testing
-- Prometheus metrics implemented on API (`http_requests_total`, `api_upload_seconds`, `api_status_seconds`) and Python worker (`worker_jobs_total`, `worker_job_duration_seconds`, `worker_active_jobs`).
-- Grafana dashboard created in `observability/grafana/dashboards/logistics_overview.json`.
-- Benchmarks executed across three test tiers:
-  - **L1 (API Latency):** Evaluated at 5 RPS (p95: 14.8 ms), 20 RPS (p95: 16.4 ms), and 50 RPS (p95: 18.2 ms).
-  - **L2 (Worker Scaling):** Evaluated with 1 worker (0.97 jobs/s), 2 workers (1.89 jobs/s), and 3 workers (2.81 jobs/s), showing near-linear 2.90x scaling efficiency.
-  - **L3 (Real OCR):** Measured real EasyOCR execution across 10 jobs (mean 1.87s, median 1.83s, p95 2.01s).
-- Full report and Grafana screenshots in `docs/perf/LOAD_TEST_REPORT.md` and `docs/perf/img/`.
+- See `docs/perf/LOAD_TEST_REPORT.md`. Its numbers were checked against the raw k6 and L3 files on 2026-11-19:
+  - L1: upload p95 10.65 / 7.57 / 5.36 ms at 5 / 20 / 50 req/s, 0 errors.
+  - L2: 1.89 / 3.59 / 5.04 jobs/s with 1 / 2 / 3 workers (2.67x).
+  - L3: 20 real-OCR jobs, median 5.93 s, OCR 87.5% of the time.
+- Stub mode (500 ms), single laptop.
 
 ### Part C: AWS S3 and Deployment
 - S3 abstraction (`StorageService`, `LocalFileStorageService`, `S3StorageService`, `backend/app/storage.py`) verified locally with LocalStack and moto.
 - Terraform configurations created and validated (`terraform fmt -check`, `terraform validate`).
 - GitHub Actions OIDC workflow configured in `.github/workflows/deploy.yml`.
 - API Key authentication and rate limiting implemented and verified with unit tests and local smoke testing.
+- 2026-11-19 fixes:
+  - `deploy/nginx.conf.template` injects `X-API-KEY` server-side, because the dashboard sends no key and would otherwise get 401.
+  - `deploy/remote_deploy.sh` and a deploy step in `deploy.yml`: the instance previously never received the compose file, the nginx config or a `.env` with secrets.
+  - The SSM document ARN in the deploy role (AWS-owned documents have no account id).
+  - `allowed_ingress_cidrs` now has no default.
 - **Live AWS Cloud Provisioning (`terraform apply`):** Not run by agent per safety ground rules. Reserved for repository owner. Complete step-by-step instructions and smoke test verification provided in `docs/DEPLOY.md`.
