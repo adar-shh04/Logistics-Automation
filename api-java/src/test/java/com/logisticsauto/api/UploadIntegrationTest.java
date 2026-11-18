@@ -53,6 +53,7 @@ class UploadIntegrationTest {
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", redis::getFirstMappedPort);
         registry.add("app.upload-dir", () -> tempDir.toString());
+        registry.add("app.storage.type", () -> "local");
     }
 
     @Autowired
@@ -105,6 +106,7 @@ class UploadIntegrationTest {
 
         assertThat(valMap.get("document_id")).isEqualTo(String.valueOf(doc.getId()));
         assertThat(valMap.get("file_path")).isEqualTo(savedFile.toString());
+        assertThat(valMap.get("storage_uri")).isEqualTo("file://" + savedFile.toAbsolutePath().toString().replace("\\", "/"));
         assertThat(valMap.get("attempt")).isEqualTo("1");
         assertThat(valMap.get("job_id")).isNotNull();
         assertThat(valMap.get("enqueued_at")).isNotNull();
