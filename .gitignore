@@ -60,3 +60,10 @@ api-java/target/
 # Evaluation cache
 eval/.cache/
 eval/cache/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+crash.log
