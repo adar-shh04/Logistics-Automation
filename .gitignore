@@ -51,3 +51,8 @@ uploads/
 *.swo
 .DS_Store
 Thumbs.db
+
+# Java & Maven
+target/
+api-java/target/
+*.class

@@ -13,6 +13,7 @@ class Document(Base):
     fields = Column(JSON)  # extracted fields
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
     processed = Column(Boolean, default=False)
+    status = Column(String(20), default="processing", nullable=False)
     processing_notes = Column(Text)
 
 
