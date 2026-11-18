@@ -55,7 +55,6 @@ services:
   worker:
     build:
       context: ./backend
-    container_name: logistics_worker
     command: python -m app.stream_worker
     volumes:
       - ./backend/app:/app

@@ -1,21 +1,65 @@
+import logging
 import os
 import signal
 import socket
+import threading
 import time
-import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 import redis
 from sqlalchemy import text
+from app import audit, fraud, hs_mapper, nlp, ocr
 from app.config import settings
 from app.db import SessionLocal, engine
-from app import ocr, nlp, fraud, hs_mapper, audit
 from app.models import Document, Transaction
+
+try:
+    from prometheus_client import Counter, Gauge, Histogram, start_http_server
+    PROMETHEUS_AVAILABLE = True
+except ImportError:
+    PROMETHEUS_AVAILABLE = False
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("stream_worker")
 
 STREAM_KEY = "logistics:jobs"
 CONSUMER_GROUP = "workers"
+
+# Configuration for Load Testing Stub Mode
+WORKER_STUB_MODE = os.getenv("WORKER_STUB_MODE", "false").lower() in ("true", "1", "yes")
+WORKER_STUB_DELAY_MS = int(os.getenv("WORKER_STUB_DELAY_MS", "500"))
+
+# Prometheus Metrics Definitions
+if PROMETHEUS_AVAILABLE:
+    JOBS_TOTAL = Counter(
+        "logistics_jobs_total",
+        "Total worker jobs processed by outcome",
+        ["outcome"]
+    )
+    JOB_DURATION = Histogram(
+        "logistics_job_duration_seconds",
+        "Job end-to-end processing duration in seconds",
+        buckets=[0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0]
+    )
+    STAGE_DURATION = Histogram(
+        "logistics_stage_duration_seconds",
+        "Duration of individual pipeline stages in seconds",
+        ["stage"],
+        buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0]
+    )
+    QUEUE_PENDING = Gauge(
+        "logistics_queue_pending",
+        "Number of pending unacknowledged messages in Redis stream"
+    )
+    QUEUE_LAG = Gauge(
+        "logistics_queue_lag",
+        "Estimated consumer group lag in Redis stream"
+    )
+else:
+    JOBS_TOTAL = None
+    JOB_DURATION = None
+    STAGE_DURATION = None
+    QUEUE_PENDING = None
+    QUEUE_LAG = None
 
 running = True
 
@@ -42,6 +86,7 @@ def wait_for_database(timeout: int = 60):
 
 
 def process(doc_id: int, file_path: str):
+    job_t0 = time.perf_counter()
     db = SessionLocal()
     try:
         doc = None
@@ -53,37 +98,78 @@ def process(doc_id: int, file_path: str):
         if not doc:
             raise ValueError(f"Document {doc_id} not found")
 
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"File {file_path} not found")
+        # --- STUB MODE (Phase B2) ---
+        if WORKER_STUB_MODE:
+            if WORKER_STUB_DELAY_MS > 0:
+                time.sleep(WORKER_STUB_DELAY_MS / 1000.0)
 
-        with open(file_path, "rb") as f:
-            content = f.read()
+            fields = {
+                "invoice_no": f"STUB-{doc_id}",
+                "invoice_date": "2026-03-15",
+                "total_amount": 10000.0,
+                "gstin": "27AABCU9603R1ZM",
+                "hs_code": "8471",
+                "party": "Stub Industrial Logistics",
+                "extraction_method": "stub",
+            }
+            party = fields["party"]
+            total_amt_float = fields["total_amount"]
+            risk_score = 0.1
+            is_flagged = False
 
-        # --- OCR ---
-        text_out, details = ocr.extract_text_from_image_bytes(content)
+            # Observe 0-latency for bypassed stages
+            if STAGE_DURATION:
+                STAGE_DURATION.labels(stage="ocr").observe(0.0)
+                STAGE_DURATION.labels(stage="parse").observe(0.0)
+                STAGE_DURATION.labels(stage="hs_lookup").observe(0.0)
+                STAGE_DURATION.labels(stage="score").observe(0.0)
 
-        # --- NLP parse ---
-        fields = nlp.parse_invoice_text(text_out)
+        else:
+            # --- REAL PIPELINE ---
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"File {file_path} not found")
 
-        # --- HS Code Lookup ---
-        if "hs_code" in fields and fields["hs_code"]:
-            hs_desc = hs_mapper.lookup(fields["hs_code"])
-            if hs_desc:
-                fields["hs_description"] = hs_desc
+            with open(file_path, "rb") as f:
+                content = f.read()
 
-        # --- Risk Scoring ---
-        party = fields.get("party", "Unknown")
-        total_amt = fields.get("total_amount", 0) or 0
-        try:
-            total_amt_float = float(total_amt)
-        except (ValueError, TypeError):
-            total_amt_float = 0.0
+            # 1. OCR Stage
+            t_stage = time.perf_counter()
+            text_out, details = ocr.extract_text_from_image_bytes(content)
+            if STAGE_DURATION:
+                STAGE_DURATION.labels(stage="ocr").observe(time.perf_counter() - t_stage)
 
-        features = {"total_amount": total_amt_float, "party_txn_count": 1}
-        risk_score = fraud.predict_risk(features)
-        is_flagged = risk_score > 0.6
+            # 2. Parse Stage
+            t_stage = time.perf_counter()
+            fields = nlp.parse_invoice_text(text_out)
+            if STAGE_DURATION:
+                STAGE_DURATION.labels(stage="parse").observe(time.perf_counter() - t_stage)
 
-        # --- Update Document and Transaction atomically in the same transaction ---
+            # 3. HS Lookup Stage
+            t_stage = time.perf_counter()
+            if "hs_code" in fields and fields["hs_code"]:
+                hs_desc = hs_mapper.lookup(fields["hs_code"])
+                if hs_desc:
+                    fields["hs_description"] = hs_desc
+            if STAGE_DURATION:
+                STAGE_DURATION.labels(stage="hs_lookup").observe(time.perf_counter() - t_stage)
+
+            # 4. Risk Scoring Stage
+            t_stage = time.perf_counter()
+            party = fields.get("party", "Unknown")
+            total_amt = fields.get("total_amount", 0) or 0
+            try:
+                total_amt_float = float(total_amt)
+            except (ValueError, TypeError):
+                total_amt_float = 0.0
+
+            features = {"total_amount": total_amt_float, "party_txn_count": 1}
+            risk_score = fraud.predict_risk(features)
+            is_flagged = risk_score > 0.6
+            if STAGE_DURATION:
+                STAGE_DURATION.labels(stage="score").observe(time.perf_counter() - t_stage)
+
+        # 5. Database Persistence Stage
+        t_stage = time.perf_counter()
         doc.fields = fields
         doc.processed = True
         doc.status = "completed"
@@ -100,8 +186,11 @@ def process(doc_id: int, file_path: str):
         db.add(txn)
         db.commit()
         db.refresh(txn)
+        if STAGE_DURATION:
+            STAGE_DURATION.labels(stage="db").observe(time.perf_counter() - t_stage)
 
-        # --- Audit Trail ---
+        # 6. Audit Trail Stage
+        t_stage = time.perf_counter()
         audit_payload = {
             "document_id": doc.id,
             "transaction_id": txn.id,
@@ -110,7 +199,16 @@ def process(doc_id: int, file_path: str):
             "risk_score": risk_score,
         }
         audit.append_audit("UPLOAD_DOCUMENT", audit_payload)
-        logger.info(f"Successfully processed doc {doc.id} ({doc.filename}) -> txn {txn.id}")
+        if STAGE_DURATION:
+            STAGE_DURATION.labels(stage="audit").observe(time.perf_counter() - t_stage)
+
+        total_job_time = time.perf_counter() - job_t0
+        if JOB_DURATION:
+            JOB_DURATION.observe(total_job_time)
+
+        logger.info(
+            f"Successfully processed doc {doc.id} ({doc.filename}) -> txn {txn.id} in {total_job_time:.3f}s"
+        )
 
     except Exception:
         db.rollback()
@@ -131,6 +229,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
     if not doc_id_str or not file_path:
         logger.error(f"Malformed job {entry_id}: {job_data}")
         r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
+        if JOBS_TOTAL:
+            JOBS_TOTAL.labels(outcome="failed").inc()
         return
 
     doc_id = int(doc_id_str)
@@ -147,6 +247,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
                 doc.processed = True
                 db.commit()
             r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
+            if JOBS_TOTAL:
+                JOBS_TOTAL.labels(outcome="skipped_duplicate").inc()
             return
     finally:
         db.close()
@@ -154,6 +256,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
     try:
         process(doc_id, file_path)
         r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
+        if JOBS_TOTAL:
+            JOBS_TOTAL.labels(outcome="success").inc()
     except Exception as e:
         clean_err = str(e).split("\n")[0][:200]
         logger.error(f"Job failure (entry={entry_id}, doc={doc_id}, attempt={attempt}): {clean_err}")
@@ -162,6 +266,8 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
             new_payload["attempt"] = str(attempt + 1)
             r.xadd(STREAM_KEY, new_payload)
             r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
+            if JOBS_TOTAL:
+                JOBS_TOTAL.labels(outcome="retried").inc()
         else:
             # Final failure after 3 attempts
             db_fail = SessionLocal()
@@ -176,6 +282,39 @@ def handle_job(r: redis.Redis, entry_id: str, job_data: Dict[str, Any]):
             finally:
                 db_fail.close()
             r.xack(STREAM_KEY, CONSUMER_GROUP, entry_id)
+            if JOBS_TOTAL:
+                JOBS_TOTAL.labels(outcome="failed").inc()
+
+
+def update_queue_metrics_loop(r: redis.Redis):
+    """Background thread polling Redis stream metrics every 5 seconds."""
+    while running:
+        try:
+            if QUEUE_PENDING or QUEUE_LAG:
+                # XPENDING
+                pending_info = r.xpending(STREAM_KEY, CONSUMER_GROUP)
+                if isinstance(pending_info, dict):
+                    pending_count = pending_info.get("pending", 0)
+                elif isinstance(pending_info, (list, tuple)) and len(pending_info) > 0:
+                    pending_count = pending_info[0]
+                else:
+                    pending_count = 0
+
+                if QUEUE_PENDING:
+                    QUEUE_PENDING.set(pending_count)
+
+                # XINFO GROUPS to estimate lag
+                lag = 0
+                groups = r.xinfo_groups(STREAM_KEY)
+                for g in groups:
+                    if g.get("name") == CONSUMER_GROUP:
+                        lag = g.get("lag", 0) or 0
+                        break
+                if QUEUE_LAG:
+                    QUEUE_LAG.set(lag)
+        except Exception:
+            pass
+        time.sleep(5)
 
 
 def init_stream_group(r: redis.Redis):
@@ -206,6 +345,20 @@ def run_worker(r: Optional[redis.Redis] = None, check_db: bool = True):
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
 
+    if WORKER_STUB_MODE:
+        logger.warning("=" * 60)
+        logger.warning(f"*** WORKER_STUB_MODE IS ENABLED (delay={WORKER_STUB_DELAY_MS} ms) ***")
+        logger.warning("All OCR, NLP parsing, and isolation forest scoring will be bypassed.")
+        logger.warning("=" * 60)
+
+    # Start Prometheus HTTP Server on Port 9100
+    if PROMETHEUS_AVAILABLE:
+        try:
+            start_http_server(9100)
+            logger.info("Prometheus metrics server started on port 9100")
+        except Exception as e:
+            logger.warning(f"Could not start Prometheus HTTP server on port 9100: {e}")
+
     if check_db:
         wait_for_database()
 
@@ -216,6 +369,10 @@ def run_worker(r: Optional[redis.Redis] = None, check_db: bool = True):
     init_stream_group(r)
     reclaim_stuck_entries(r, consumer_name)
 
+    # Start background queue metrics updater thread
+    updater_thread = threading.Thread(target=update_queue_metrics_loop, args=(r,), daemon=True)
+    updater_thread.start()
+
     logger.info(f"Worker started listening to stream '{STREAM_KEY}' as '{consumer_name}'")
 
     while running:
@@ -224,7 +381,6 @@ def run_worker(r: Optional[redis.Redis] = None, check_db: bool = True):
                 CONSUMER_GROUP, consumer_name, {STREAM_KEY: ">"}, count=1, block=5000
             )
             if not entries:
-                # Reclaim any stuck entries when idle
                 reclaim_stuck_entries(r, consumer_name)
                 continue
 

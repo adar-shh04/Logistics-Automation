@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import threading
 from typing import Optional, Tuple
 from sqlalchemy import text
 from app.db import SessionLocal
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 LEDGER_FILE = os.getenv("LEDGER_FILE", "/app/models/ledger.txt")
 AUDIT_LOCK_ID = 84729104
+_audit_thread_lock = threading.Lock()
 
 
 def compute_hash(record: dict, prev_hash: str = "") -> str:
@@ -25,46 +27,47 @@ def compute_hash(record: dict, prev_hash: str = "") -> str:
 def append_audit(action: str, payload: dict) -> str:
     """
     Serializes audit entries across multiple concurrent workers using a PostgreSQL
-    transaction advisory lock (pg_advisory_xact_lock).
+    transaction advisory lock (pg_advisory_xact_lock) and a local process mutex.
     The last audit_logs row in Postgres is the source of truth for the hash chain.
     The ledger file is also appended inside the same locked transaction.
     """
-    db = SessionLocal()
-    try:
-        # Acquire advisory transaction lock on PostgreSQL
-        if db.bind and db.bind.dialect.name == "postgresql":
-            db.execute(text("SELECT pg_advisory_xact_lock(:lock_id)"), {"lock_id": AUDIT_LOCK_ID})
+    with _audit_thread_lock:
+        db = SessionLocal()
+        try:
+            # Acquire advisory transaction lock on PostgreSQL
+            if db.bind and db.bind.dialect.name == "postgresql":
+                db.execute(text("SELECT pg_advisory_xact_lock(:lock_id)"), {"lock_id": AUDIT_LOCK_ID})
 
-        # Fetch the previous hash from the most recent row in audit_logs
-        last_entry = db.query(AuditLog).order_by(AuditLog.id.desc()).first()
-        prev_hash = last_entry.hash if (last_entry and last_entry.hash) else ""
+            # Fetch the previous hash from the most recent row in audit_logs
+            last_entry = db.query(AuditLog).order_by(AuditLog.id.desc()).first()
+            prev_hash = last_entry.hash if (last_entry and last_entry.hash) else ""
 
-        record = {"action": action, "payload": payload}
-        h = compute_hash(record, prev_hash)
+            record = {"action": action, "payload": payload}
+            h = compute_hash(record, prev_hash)
 
-        # Write to ledger file inside the same lock
-        if LEDGER_FILE:
-            try:
-                parent_dir = os.path.dirname(LEDGER_FILE)
-                if parent_dir:
-                    os.makedirs(parent_dir, exist_ok=True)
-                with open(LEDGER_FILE, "ab") as f:
-                    line = h + "|" + action + "|" + json.dumps(payload, default=str) + "\n"
-                    f.write(line.encode("utf-8"))
-            except Exception as fe:
-                logger.warning("Could not append to ledger file %s: %s", LEDGER_FILE, fe)
+            # Write to ledger file inside the same lock
+            if LEDGER_FILE:
+                try:
+                    parent_dir = os.path.dirname(LEDGER_FILE)
+                    if parent_dir:
+                        os.makedirs(parent_dir, exist_ok=True)
+                    with open(LEDGER_FILE, "ab") as f:
+                        line = h + "|" + action + "|" + json.dumps(payload, default=str) + "\n"
+                        f.write(line.encode("utf-8"))
+                except Exception as fe:
+                    logger.warning("Could not append to ledger file %s: %s", LEDGER_FILE, fe)
 
-        # Persist to database
-        audit = AuditLog(action=action, payload=payload, hash=h)
-        db.add(audit)
-        db.commit()
-        return h
+            # Persist to database
+            audit = AuditLog(action=action, payload=payload, hash=h)
+            db.add(audit)
+            db.commit()
+            return h
 
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
 
 
 def verify_chain(db=None) -> Tuple[bool, str]:
