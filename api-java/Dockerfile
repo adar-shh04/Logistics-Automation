@@ -8,7 +8,10 @@ RUN mvn -q -DskipTests package
 # Run stage
 FROM eclipse-temurin:21-jre
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-RUN useradd -m appuser
+RUN useradd -m appuser && \
+    mkdir -p /data/uploads && \
+    chown -R appuser:appuser /data/uploads && \
+    chmod 777 /data/uploads
 USER appuser
 WORKDIR /app
 COPY --from=build --chown=appuser:appuser /app/target/*.jar app.jar
