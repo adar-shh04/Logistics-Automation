@@ -104,6 +104,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      target: dev
     container_name: logistics_frontend
     ports:
       - "5173:5173"
