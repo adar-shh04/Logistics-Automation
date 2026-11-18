@@ -68,7 +68,7 @@ cd infra/terraform
 terraform init
 
 # Generate execution plan
-terraform plan -out=tfplan
+terraform plan -out=tfplan -var 'allowed_ingress_cidrs=["<your-ip>/32"]'
 ```
 Review the proposed resources. Verify that:
 - S3 bucket has public access blocked.

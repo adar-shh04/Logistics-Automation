@@ -41,9 +41,13 @@ variable "github_repo" {
 }
 
 variable "allowed_ingress_cidrs" {
-  description = "CIDR blocks allowed for inbound HTTP (port 80) and HTTPS (port 443)"
+  description = "CIDR blocks allowed for inbound HTTP/HTTPS. No default on purpose: set your own IP (e.g. [\"203.0.113.7/32\"]) for a demo. Opening to [\"0.0.0.0/0\"] makes the upload form public, and anyone could use your Gemini quota."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+
+  validation {
+    condition     = length(var.allowed_ingress_cidrs) > 0
+    error_message = "Set allowed_ingress_cidrs explicitly, for example [\"<your-ip>/32\"]."
+  }
 }
 
 variable "api_key" {

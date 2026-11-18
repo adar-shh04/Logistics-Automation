@@ -139,7 +139,7 @@ terraform fmt -check
 terraform validate
 
 # 3. Generate and inspect execution plan
-terraform plan -out=tfplan
+terraform plan -out=tfplan -var 'allowed_ingress_cidrs=["<your-ip>/32"]'
 
 # 4. Apply infrastructure changes (Owner action)
 terraform apply tfplan
@@ -190,13 +190,15 @@ Before public traffic reaches the instance, the deployment enforces multi-layere
 All write and retrieval endpoints (`POST /upload`, `GET /status/**`, `GET /transaction/**`) require an `X-API-KEY` HTTP header matching the secure token stored in SSM (`/logistics/api_key`).
 - Requests missing or supplying an invalid key receive `HTTP 401 Unauthorized`.
 - Public health (`GET /health`) and readiness checks remain open.
+- **How the dashboard gets through:** the browser never sees the key. `deploy/nginx.conf.template` adds `X-API-KEY` to every proxied `/api/...` request on the server side (the nginx image renders the template with `APP_API_KEY` at start-up). Without this, the dashboard's uploads would all fail with 401, because `frontend/src/api.js` sends no key.
+- **What the key does and does not protect:** it stops anyone calling the API container directly, but anyone who can open the dashboard can upload through it. The real public protection is the **security-group allow-list** (`allowed_ingress_cidrs`, which has no default: set it to your own IP, e.g. `["203.0.113.7/32"]`) plus the upload rate limit.
 
 ### 2. Rate Limiting
 - **API Level (`RateLimitFilter`):** In-memory sliding window limiter restricting uploads to **10 requests per minute per IP**. Exceeded requests receive `HTTP 429 Too Many Requests`.
-- **Nginx Level (`nginx.conf`):** Defines `limit_req_zone $binary_remote_addr zone=api_upload:10m rate=10r/m;` to absorb burst attempts before reaching application threads.
+- **Nginx Level (`deploy/nginx.conf.template`):** Defines `limit_req_zone $binary_remote_addr zone=api_upload:10m rate=10r/m;` to absorb burst attempts before reaching application threads.
 
 ### 3. Actuator Lockdown
-The Spring Boot Actuator exposes sensitive system metrics and environment info. In `deploy/nginx.conf`:
+The Spring Boot Actuator exposes sensitive system metrics and environment info. In `deploy/nginx.conf.template`:
 - `GET /actuator/health` is permitted for external uptime checks.
 - All other endpoints (`/actuator/prometheus`, `/actuator/env`, `/actuator/heapdump`) return `HTTP 403 Forbidden` to public callers.
 
@@ -208,6 +210,22 @@ The Spring Boot Actuator exposes sensitive system metrics and environment info. 
   ```
 
 ---
+
+## 6b. What the deploy step does on the instance
+
+`.github/workflows/deploy.yml` builds and pushes the three images tagged with the commit SHA, then uses SSM Run Command to run `deploy/remote_deploy.sh` on the instance. The script:
+
+1. checks out `deploy/` for that commit from GitHub into `/opt/logistics`;
+2. reads `/logistics/db_password`, `/logistics/api_key` and (optionally) `/logistics/gemini_api_key` from SSM with the **instance role**, and writes `/opt/logistics/.env` with mode 600;
+3. logs in to ECR with the instance role, pulls the images for that SHA and runs `docker compose up -d`.
+
+No secret passes through GitHub Actions. Repository variables to set: `AWS_DEPLOY_ROLE_ARN`, `EC2_INSTANCE_ID`, `S3_BUCKET`, and `DB_HOST` only when `use_rds = true` (the RDS host name). You can also run the same script by hand from an SSM session:
+
+```bash
+sudo bash /opt/logistics/src/deploy/remote_deploy.sh <git-sha> <account>.dkr.ecr.ap-south-1.amazonaws.com <bucket> ap-south-1
+```
+
+**Status (2026-11-19):** this path has been written and checked locally (`bash -n`, `terraform validate`) but **has not yet run against AWS**. The first real deploy is the test.
 
 ## 7. Verification & Smoke Testing
 
